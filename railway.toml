@@ -6,3 +6,6 @@ buildCommand = "npm install --legacy-peer-deps && npm run build"
 startCommand = "npm run start"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
+
+[nixpacks]
+nixpkgs = ["nodejs_20", "openssl"]
