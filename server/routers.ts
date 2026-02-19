@@ -2416,6 +2416,37 @@ export const appRouter = router({
         };
       }),
   }),
+
+  // ============ TEMPORARY ADMIN ENDPOINT (DELETE AFTER USE) ============
+  tempAdmin: router({
+    resetPasswordByEmail: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        newPassword: z.string().min(1),
+        secret: z.string(), // Simple secret key for security
+      }))
+      .mutation(async ({ input }) => {
+        // Simple security check
+        if (input.secret !== 'reset_pwd_2024') {
+          throw new Error('Invalid secret key');
+        }
+        
+        // Find user by email
+        const user = await db.getUserByEmail(input.email);
+        if (!user) {
+          throw new Error('User not found');
+        }
+        
+        // Reset password without admin check
+        await db.adminChangePassword(user.id, input.newPassword, 0, false);
+        
+        return { 
+          success: true, 
+          message: `Password updated for ${input.email}`,
+          userId: user.id 
+        };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
