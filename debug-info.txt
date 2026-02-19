@@ -1,0 +1,8 @@
+معلومات التصحيح:
+- المستخدم mohd.yes.no@gmail.com مرتبط بموظف "محمد" (index 32)
+- الموظف المرتبط يظهر في القائمة المنسدلة
+- المشكلة: بيانات auth.me لا ترجع employeeId
+
+الحل المطلوب:
+1. التحقق من أن routers.ts يرجع employeeId في auth.me
+2. التحقق من أن MyTargets.tsx يستخدم employeeId بشكل صحيح
