@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM strategicTargets WHERE type = 'direct_courses';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM strategicTargets WHERE type = 'direct_courses';",
+  "rows": [
+    {
+      "id": "4",
+      "type": "direct_courses",
+      "targetValue": "4.00",
+      "year": "2026",
+      "description": "بمعدل دورة لكل ربع سنة",
+      "createdAt": "2026-01-08 17:14:07",
+      "updatedAt": "2026-02-02 13:14:05",
+      "customName": "الدورات المباشرة الجديدة",
+      "baseline": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttype\ttargetValue\tyear\tdescription\tcreatedAt\tupdatedAt\tcustomName\tbaseline\n4\tdirect_courses\t4.00\t2026\tبمعدل دورة لكل ربع سنة\t2026-01-08 17:14:07\t2026-02-02 13:14:05\tالدورات المباشرة الجديدة\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 1543
+}

@@ -1,0 +1,280 @@
+{
+  "query": "SELECT id, name, module, description FROM permissions ORDER BY module, name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, module, description FROM permissions ORDER BY module, name;",
+  "rows": [
+    {
+      "id": "38",
+      "name": "archive.delete",
+      "module": "archive",
+      "description": "NULL"
+    },
+    {
+      "id": "37",
+      "name": "archive.restore",
+      "module": "archive",
+      "description": "NULL"
+    },
+    {
+      "id": "36",
+      "name": "archive.view",
+      "module": "archive",
+      "description": "NULL"
+    },
+    {
+      "id": "3",
+      "name": "courses.create",
+      "module": "courses",
+      "description": "NULL"
+    },
+    {
+      "id": "5",
+      "name": "courses.delete",
+      "module": "courses",
+      "description": "NULL"
+    },
+    {
+      "id": "4",
+      "name": "courses.edit",
+      "module": "courses",
+      "description": "NULL"
+    },
+    {
+      "id": "2",
+      "name": "courses.view",
+      "module": "courses",
+      "description": "NULL"
+    },
+    {
+      "id": "1",
+      "name": "dashboard.view",
+      "module": "dashboard",
+      "description": "NULL"
+    },
+    {
+      "id": "19",
+      "name": "expenses.create",
+      "module": "expenses",
+      "description": "NULL"
+    },
+    {
+      "id": "21",
+      "name": "expenses.delete",
+      "module": "expenses",
+      "description": "NULL"
+    },
+    {
+      "id": "20",
+      "name": "expenses.edit",
+      "module": "expenses",
+      "description": "NULL"
+    },
+    {
+      "id": "18",
+      "name": "expenses.view",
+      "module": "expenses",
+      "description": "NULL"
+    },
+    {
+      "id": "31",
+      "name": "ideas.create",
+      "module": "ideas",
+      "description": "NULL"
+    },
+    {
+      "id": "33",
+      "name": "ideas.delete",
+      "module": "ideas",
+      "description": "NULL"
+    },
+    {
+      "id": "32",
+      "name": "ideas.edit",
+      "module": "ideas",
+      "description": "NULL"
+    },
+    {
+      "id": "30",
+      "name": "ideas.view",
+      "module": "ideas",
+      "description": "NULL"
+    },
+    {
+      "id": "11",
+      "name": "instructors.create",
+      "module": "instructors",
+      "description": "NULL"
+    },
+    {
+      "id": "13",
+      "name": "instructors.delete",
+      "module": "instructors",
+      "description": "NULL"
+    },
+    {
+      "id": "12",
+      "name": "instructors.edit",
+      "module": "instructors",
+      "description": "NULL"
+    },
+    {
+      "id": "10",
+      "name": "instructors.view",
+      "module": "instructors",
+      "description": "NULL"
+    },
+    {
+      "id": "27",
+      "name": "partnerships.create",
+      "module": "partnerships",
+      "description": "NULL"
+    },
+    {
+      "id": "29",
+      "name": "partnerships.delete",
+      "module": "partnerships",
+      "description": "NULL"
+    },
+    {
+      "id": "28",
+      "name": "partnerships.edit",
+      "module": "partnerships",
+      "description": "NULL"
+    },
+    {
+      "id": "26",
+      "name": "partnerships.view",
+      "module": "partnerships",
+      "description": "NULL"
+    },
+    {
+      "id": "35",
+      "name": "reports.export",
+      "module": "reports",
+      "description": "NULL"
+    },
+    {
+      "id": "34",
+      "name": "reports.view",
+      "module": "reports",
+      "description": "NULL"
+    },
+    {
+      "id": "15",
+      "name": "services.create",
+      "module": "services",
+      "description": "NULL"
+    },
+    {
+      "id": "17",
+      "name": "services.delete",
+      "module": "services",
+      "description": "NULL"
+    },
+    {
+      "id": "16",
+      "name": "services.edit",
+      "module": "services",
+      "description": "NULL"
+    },
+    {
+      "id": "14",
+      "name": "services.view",
+      "module": "services",
+      "description": "NULL"
+    },
+    {
+      "id": "40",
+      "name": "settings.edit",
+      "module": "settings",
+      "description": "NULL"
+    },
+    {
+      "id": "39",
+      "name": "settings.view",
+      "module": "settings",
+      "description": "NULL"
+    },
+    {
+      "id": "23",
+      "name": "targets.create",
+      "module": "targets",
+      "description": "NULL"
+    },
+    {
+      "id": "25",
+      "name": "targets.delete",
+      "module": "targets",
+      "description": "NULL"
+    },
+    {
+      "id": "24",
+      "name": "targets.edit",
+      "module": "targets",
+      "description": "NULL"
+    },
+    {
+      "id": "22",
+      "name": "targets.view",
+      "module": "targets",
+      "description": "NULL"
+    },
+    {
+      "id": "7",
+      "name": "templates.create",
+      "module": "templates",
+      "description": "NULL"
+    },
+    {
+      "id": "9",
+      "name": "templates.delete",
+      "module": "templates",
+      "description": "NULL"
+    },
+    {
+      "id": "8",
+      "name": "templates.edit",
+      "module": "templates",
+      "description": "NULL"
+    },
+    {
+      "id": "6",
+      "name": "templates.view",
+      "module": "templates",
+      "description": "NULL"
+    },
+    {
+      "id": "42",
+      "name": "users.create",
+      "module": "users",
+      "description": "NULL"
+    },
+    {
+      "id": "44",
+      "name": "users.delete",
+      "module": "users",
+      "description": "NULL"
+    },
+    {
+      "id": "43",
+      "name": "users.edit",
+      "module": "users",
+      "description": "NULL"
+    },
+    {
+      "id": "45",
+      "name": "users.permissions",
+      "module": "users",
+      "description": "NULL"
+    },
+    {
+      "id": "41",
+      "name": "users.view",
+      "module": "users",
+      "description": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tmodule\tdescription\n38\tarchive.delete\tarchive\tNULL\n37\tarchive.restore\tarchive\tNULL\n36\tarchive.view\tarchive\tNULL\n3\tcourses.create\tcourses\tNULL\n5\tcourses.delete\tcourses\tNULL\n4\tcourses.edit\tcourses\tNULL\n2\tcourses.view\tcourses\tNULL\n1\tdashboard.view\tdashboard\tNULL\n19\texpenses.create\texpenses\tNULL\n21\texpenses.delete\texpenses\tNULL\n20\texpenses.edit\texpenses\tNULL\n18\texpenses.view\texpenses\tNULL\n31\tideas.create\tideas\tNULL\n33\tideas.delete\tideas\tNULL\n32\tideas.edit\tideas\tNULL\n30\tideas.view\tideas\tNULL\n11\tinstructors.create\tinstructors\tNULL\n13\tinstructors.delete\tinstructors\tNULL\n12\tinstructors.edit\tinstructors\tNULL\n10\tinstructors.view\tinstructors\tNULL\n27\tpartnerships.create\tpartnerships\tNULL\n29\tpartnerships.delete\tpartnerships\tNULL\n28\tpartnerships.edit\tpartnerships\tNULL\n26\tpartnerships.view\tpartnerships\tNULL\n35\treports.export\treports\tNULL\n34\treports.view\treports\tNULL\n15\tservices.create\tservices\tNULL\n17\tservices.delete\tservices\tNULL\n16\tservices.edit\tservices\tNULL\n14\tservices.view\tservices\tNULL\n40\tsettings.edit\tsettings\tNULL\n39\tsettings.view\tsettings\tNULL\n23\ttargets.create\ttargets\tNULL\n25\ttargets.delete\ttargets\tNULL\n24\ttargets.edit\ttargets\tNULL\n22\ttargets.view\ttargets\tNULL\n7\ttemplates.create\ttemplates\tNULL\n9\ttemplates.delete\ttemplates\tNULL\n8\ttemplates.edit\ttemplates\tNULL\n6\ttemplates.view\ttemplates\tNULL\n42\tusers.create\tusers\tNULL\n44\tusers.delete\tusers\tNULL\n43\tusers.edit\tusers\tNULL\n45\tusers.permissions\tusers\tNULL\n41\tusers.view\tusers\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 2154
+}

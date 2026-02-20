@@ -562,6 +562,8 @@ value={selectedEmployeeId?.toString() || "all"}
                 <CardTitle>قائمة المستهدفات</CardTitle>
                 <CardDescription>
                   {months.find((m) => m.value === selectedMonth)?.label} {selectedYear}
+                  {" — "}
+                  <span className="text-xs text-emerald-600">يتم حساب المتحقق تلقائياً من الإحصائيات اليومية المعتمدة</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -577,6 +579,9 @@ value={selectedEmployeeId?.toString() || "all"}
                       <TableRow>
                         <TableHead className="text-right">الموظف</TableHead>
                         <TableHead className="text-right">نوع المستهدف</TableHead>
+                        <TableHead className="text-right">المستهدف</TableHead>
+                        <TableHead className="text-right">المتحقق (تلقائي)</TableHead>
+                        <TableHead className="text-right">المتبقي</TableHead>
                         <TableHead className="text-right">التقدم</TableHead>
                         <TableHead className="text-right">المكافأة</TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
@@ -585,24 +590,49 @@ value={selectedEmployeeId?.toString() || "all"}
                     </TableHeader>
                     <TableBody>
                       {targets.map((target: any) => {
-                        const progress = getProgressPercentage(target.currentValue, target.targetValue);
+                        const targetVal = parseFloat(target.targetValue) || 0;
+                        const achievedVal = target.achieved ?? (parseFloat(target.currentValue) || 0);
+                        const dailyStatsVal = target.dailyStatsAchieved ?? achievedVal;
+                        const remainingVal = target.remaining ?? Math.max(0, targetVal - achievedVal);
+                        const progressPct = target.percentage ?? getProgressPercentage(String(achievedVal), target.targetValue);
+                        const isAchieved = achievedVal >= targetVal && targetVal > 0;
+                        
                         return (
-                          <TableRow key={target.id}>
+                          <TableRow key={target.id} className={isAchieved ? "bg-emerald-50/50" : ""}>
                             <TableCell className="font-medium">
                               {getEmployeeName(target.employeeId)}
                             </TableCell>
                             <TableCell>
                               {targetTypeLabels[target.targetType] || target.customName || target.targetType}
                             </TableCell>
+                            <TableCell className="font-semibold text-center">
+                              {targetVal}
+                            </TableCell>
                             <TableCell>
-                              <div className="space-y-1">
-                                <div className="flex justify-between text-sm">
-                                  <span>{target.currentValue || 0}</span>
-                                  <span>{target.targetValue}</span>
-                                </div>
-                                <Progress value={progress} className="h-2" />
-                                <div className="text-xs text-muted-foreground text-center">
-                                  {progress}%
+                              <div className="text-center">
+                                <span className={`font-bold text-lg ${isAchieved ? 'text-emerald-600' : 'text-blue-600'}`}>
+                                  {achievedVal}
+                                </span>
+                                {parseFloat(target.baseValue || '0') > 0 && (
+                                  <div className="text-xs text-muted-foreground">
+                                    أساسي: {parseFloat(target.baseValue || '0')} + إحصائيات: {dailyStatsVal}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <span className={`font-bold text-center block ${remainingVal === 0 ? 'text-emerald-600' : 'text-orange-600'}`}>
+                                {remainingVal === 0 ? '✓ مكتمل' : remainingVal}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1 min-w-[120px]">
+                                <Progress 
+                                  value={Math.min(progressPct, 100)} 
+                                  className={`h-2.5 ${isAchieved ? '[&>div]:bg-emerald-500' : ''}`} 
+                                />
+                                <div className={`text-xs text-center font-medium ${isAchieved ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                                  {Math.round(progressPct)}%
                                 </div>
                               </div>
                             </TableCell>
@@ -690,7 +720,7 @@ value={selectedEmployeeId?.toString() || "all"}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {new Date(reward.createdAt).toLocaleDateString("ar-SA")}
+                            {new Date(reward.createdAt).toLocaleDateString("en-US")}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">

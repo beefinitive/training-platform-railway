@@ -34,7 +34,11 @@ const monthNames = [
   "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
 ];
 
-export default function DailyStatsReview() {
+interface DailyStatsReviewProps {
+  embedded?: boolean;
+}
+
+export default function DailyStatsReview({ embedded = false }: DailyStatsReviewProps) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -134,6 +138,20 @@ export default function DailyStatsReview() {
     },
   });
 
+  // Unapprove mutation - إلغاء الموافقة
+  const unapproveMutation = trpc.dailyStats.unapprove.useMutation({
+    onSuccess: () => {
+      toast.success("تم إلغاء الموافقة بنجاح");
+      setShowReviewDialog(false);
+      setReviewNotes("");
+      refetch();
+      refetchReviewStats();
+    },
+    onError: (error) => {
+      toast.error("حدث خطأ: " + error.message);
+    },
+  });
+
   // Filter stats by search query
   const filteredStats = useMemo(() => {
     if (!searchQuery) return stats;
@@ -206,6 +224,16 @@ export default function DailyStatsReview() {
     setShowBulkApproveDialog(true);
   };
 
+  // إلغاء الموافقة على الإحصائية
+  const handleUnapprove = (stat: any) => {
+    if (confirm(`هل أنت متأكد من إلغاء الموافقة على إحصائية ${stat.employeeName}\n\nسيتم حذف الإيراد المرتبط من الدورة وتحديث المستهدفات`)) {
+      unapproveMutation.mutate({
+        id: stat.id,
+        reviewNotes: "تم إلغاء الموافقة بواسطة المشرف",
+      });
+    }
+  };
+
   const handleSubmitBulkApprove = () => {
     bulkApproveMutation.mutate({
       ids: selectedIds,
@@ -250,9 +278,9 @@ export default function DailyStatsReview() {
     { enabled: editForm.courseId > 0 }
   );
 
-  return (
-    <DashboardLayout>
-      <div className="space-y-6">
+  const content = (
+    <>
+    <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -498,7 +526,7 @@ export default function DailyStatsReview() {
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          {new Date(stat.date).toLocaleDateString("ar-SA", {
+                          {new Date(stat.date).toLocaleDateString("en-US", {
                             weekday: "short",
                             year: "numeric",
                             month: "short",
@@ -509,7 +537,7 @@ export default function DailyStatsReview() {
                           {stat.courseName ? (
                             <div>
                               <p className="font-medium text-sm">{stat.courseName}</p>
-                              <p className="text-xs text-gray-500">رسوم: {parseFloat(stat.courseFee || '0').toLocaleString('ar-SA')} ر.س</p>
+                              <p className="text-xs text-gray-500">رسوم: {parseFloat(stat.courseFee || '0').toLocaleString('en-US')} ر.س</p>
                             </div>
                           ) : (
                             <span className="text-gray-400 text-sm">غير محدد</span>
@@ -523,7 +551,7 @@ export default function DailyStatsReview() {
                         <td className="py-3 px-4 text-center">
                           {stat.calculatedRevenue && parseFloat(stat.calculatedRevenue) > 0 ? (
                             <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-1 rounded font-medium">
-                              {parseFloat(stat.calculatedRevenue).toLocaleString('ar-SA')} ر.س
+                              {parseFloat(stat.calculatedRevenue).toLocaleString('en-US')} ر.س
                             </span>
                           ) : (
                             <span className="text-gray-400">-</span>
@@ -546,7 +574,7 @@ export default function DailyStatsReview() {
                         </td>
                         <td className="py-3 px-4 text-center">
                           <span className="bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400 px-2 py-1 rounded">
-                            {parseFloat(stat.salesAmount || '0').toLocaleString('ar-SA')} ر.س
+                            {parseFloat(stat.salesAmount || '0').toLocaleString('en-US')} ر.س
                           </span>
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -597,6 +625,17 @@ export default function DailyStatsReview() {
                                 >
                                   <Pencil className="h-4 w-4" />
                                 </Button>
+                                {stat.status === "approved" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                    onClick={() => handleUnapprove(stat)}
+                                    title="إلغاء الموافقة"
+                                  >
+                                    <XCircle className="h-4 w-4" />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -639,7 +678,7 @@ export default function DailyStatsReview() {
             <DialogDescription>
               {reviewingStat && (
                 <span>
-                  إحصائية {reviewingStat.employeeName} - {new Date(reviewingStat.date).toLocaleDateString("ar-SA")}
+                  إحصائية {reviewingStat.employeeName} - {new Date(reviewingStat.date).toLocaleDateString("en-US")}
                 </span>
               )}
             </DialogDescription>
@@ -666,7 +705,7 @@ export default function DailyStatsReview() {
                   <p className="text-xs text-gray-500">الخدمات</p>
                 </div>
                 <div className="text-center col-span-2">
-                  <p className="text-2xl font-bold text-pink-600">{parseFloat(reviewingStat.salesAmount || '0').toLocaleString('ar-SA')} ر.س</p>
+                  <p className="text-2xl font-bold text-pink-600">{parseFloat(reviewingStat.salesAmount || '0').toLocaleString('en-US')} ر.س</p>
                   <p className="text-xs text-gray-500">مبلغ المبيعات</p>
                 </div>
               </div>
@@ -733,7 +772,7 @@ export default function DailyStatsReview() {
             <DialogDescription>
               {editingStat && (
                 <span>
-                  إحصائية {editingStat.employeeName} - {new Date(editingStat.date).toLocaleDateString("ar-SA")}
+                  إحصائية {editingStat.employeeName} - {new Date(editingStat.date).toLocaleDateString("en-US")}
                 </span>
               )}
             </DialogDescription>
@@ -775,7 +814,7 @@ export default function DailyStatsReview() {
                   <SelectContent>
                     {courseFees.map((fee) => (
                       <SelectItem key={fee.id} value={fee.amount}>
-                        {fee.name} - {parseFloat(fee.amount).toLocaleString('ar-SA')} ر.س
+                        {fee.name} - {parseFloat(fee.amount).toLocaleString('en-US')} ر.س
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -827,7 +866,7 @@ export default function DailyStatsReview() {
             {editForm.courseId > 0 && editForm.courseFee > 0 && (
               <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4">
                 <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                  الإيراد المتوقع: <span className="font-bold">{(editForm.confirmedCustomers * editForm.courseFee).toLocaleString('ar-SA')} ر.س</span>
+                  الإيراد المتوقع: <span className="font-bold">{(editForm.confirmedCustomers * editForm.courseFee).toLocaleString('en-US')} ر.س</span>
                 </p>
               </div>
             )}
@@ -905,6 +944,16 @@ export default function DailyStatsReview() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout>
+      {content}
     </DashboardLayout>
   );
 }

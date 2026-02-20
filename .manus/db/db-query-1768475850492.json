@@ -1,0 +1,24 @@
+{
+  "query": "SELECT * FROM users WHERE email = 'just2vip@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM users WHERE email = 'just2vip@gmail.com';",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "ZnQNqDUUbaoD4ckQY6cihQ",
+      "name": "Mohamed Ibrahim",
+      "email": "just2vip@gmail.com",
+      "loginMethod": "google",
+      "createdAt": "2026-01-06 17:51:29",
+      "updatedAt": "2026-01-15 11:16:33",
+      "lastSignedIn": "2026-01-15 11:16:33",
+      "password": "$2b$10$jaiKl6blqqB43rU3N364fe9M.e7wNtDcu7LEmePrCJ4olQlRy6zq2",
+      "roleId": "1",
+      "status": "active",
+      "employeeId": "90002"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tloginMethod\tcreatedAt\tupdatedAt\tlastSignedIn\tpassword\troleId\tstatus\temployeeId\n1\tZnQNqDUUbaoD4ckQY6cihQ\tMohamed Ibrahim\tjust2vip@gmail.com\tgoogle\t2026-01-06 17:51:29\t2026-01-15 11:16:33\t2026-01-15 11:16:33\t$2b$10$jaiKl6blqqB43rU3N364fe9M.e7wNtDcu7LEmePrCJ4olQlRy6zq2\t1\tactive\t90002\n",
+  "stderr": "",
+  "execution_time_ms": 1591
+}

@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO roles (id, name, displayName, description, isSystem, createdAt, updatedAt) \nVALUES (4, 'customer_service', 'خدمة العملاء', 'موظفو خدمة العملاء - يرون فقط صفحة المستهدفات الخاصة بهم', 1, NOW(), NOW())\nON DUPLICATE KEY UPDATE displayName = 'خدمة العملاء', description = 'موظفو خدمة العملاء - يرون فقط صفحة المستهدفات الخاصة بهم';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute INSERT INTO roles (id, name, displayName, description, isSystem, createdAt, updatedAt) \nVALUES (4, 'customer_service', 'خدمة العملاء', 'موظفو خدمة العملاء - يرون فقط صفحة المستهدفات الخاصة بهم', 1, NOW(), NOW())\nON DUPLICATE KEY UPDATE displayName = 'خدمة العملاء', description = 'موظفو خدمة العملاء - يرون فقط صفحة المستهدفات الخاصة بهم';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1663
+}

@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, longtext, timestamp, varchar, decimal, date, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, longtext, timestamp, varchar, decimal, date, boolean, json } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -108,6 +108,7 @@ export const courseFees = mysqlTable("courseFees", {
   courseId: int("courseId").notNull(),
   name: varchar("name", { length: 255 }).notNull(), // e.g., "السعر الأساسي", "خصم الطلاب"
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  originalPrice: decimal("originalPrice", { precision: 10, scale: 2 }), // السعر قبل الخصم
   description: text("description"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
@@ -611,10 +612,13 @@ export const dailyStats = mysqlTable("daily_stats", {
   confirmedCustomers: int("confirmedCustomers").notNull().default(0), // عدد العملاء المؤكدين
   courseFee: decimal("courseFee", { precision: 10, scale: 2 }).default("0"), // رسوم الدورة المستخدمة في الحساب
   calculatedRevenue: decimal("calculatedRevenue", { precision: 10, scale: 2 }).default("0"), // الإيراد المحسوب (عدد المؤكدين × رسوم الدورة)
+  feeBreakdown: text("feeBreakdown"), // تفاصيل الأسعار المتعددة (JSON) - يحتوي على {feeId, feeName, feeAmount, customerCount}[]
   registeredCustomers: int("registeredCustomers").notNull().default(0), // عدد العملاء المسجلين
   targetedCustomers: int("targetedCustomers").notNull().default(0), // عدد العملاء المستهدفين
   servicesSold: int("servicesSold").notNull().default(0), // عدد الخدمات المباعة
+  targetedByServices: int("targetedByServices").notNull().default(0), // عدد المستهدفين بالخدمات
   salesAmount: decimal("salesAmount", { precision: 10, scale: 2 }).notNull().default("0"), // مبلغ المبيعات
+  soldServices: text("soldServices"), // تفاصيل الخدمات المباعة (JSON) - يحتوي على {templateId, templateName, price, quantity}[]
   notes: text("notes"),
   // حقول المراجعة
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(), // حالة الإحصائية
@@ -646,3 +650,470 @@ export const projectEmployees = mysqlTable("projectEmployees", {
 
 export type ProjectEmployee = typeof projectEmployees.$inferSelect;
 export type InsertProjectEmployee = typeof projectEmployees.$inferInsert;
+
+
+/**
+ * Public course registrations - stores registrations from the public website
+ * Linked to courses and optionally to daily stats for employee tracking
+ */
+export const publicRegistrations = mysqlTable("public_registrations", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull(), // Reference to courses table
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  city: varchar("city", { length: 100 }),
+  organization: varchar("organization", { length: 255 }), // جهة العمل
+  notes: text("notes"),
+  source: varchar("source", { length: 100 }).default("website"), // مصدر التسجيل: website, referral, social
+  status: mysqlEnum("status", ["pending", "confirmed", "cancelled", "attended"]).default("pending").notNull(),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "paid", "refunded"]).default("unpaid").notNull(),
+  feeId: int("feeId"), // Reference to courseFees for the selected price tier
+  paidAmount: decimal("paidAmount", { precision: 10, scale: 2 }).default("0"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PublicRegistration = typeof publicRegistrations.$inferSelect;
+export type InsertPublicRegistration = typeof publicRegistrations.$inferInsert;
+
+/**
+ * Public services catalog - services displayed on the public website store
+ */
+export const publicServices = mysqlTable("public_services", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  shortDescription: varchar("shortDescription", { length: 500 }),
+  category: mysqlEnum("category", ["marketing", "training", "consulting", "design", "other"]).default("other").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  originalPrice: decimal("originalPrice", { precision: 10, scale: 2 }), // السعر قبل الخصم
+  imageUrl: text("imageUrl"),
+  features: text("features"), // JSON array of features
+  isActive: boolean("isActive").default(true).notNull(),
+  isFeatured: boolean("isFeatured").default(false).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PublicService = typeof publicServices.$inferSelect;
+export type InsertPublicService = typeof publicServices.$inferInsert;
+
+/**
+ * Service orders - orders from the public services store
+ */
+export const serviceOrders = mysqlTable("service_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  serviceId: int("serviceId").notNull(), // Reference to public_services
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  organization: varchar("organization", { length: 255 }),
+  requirements: text("requirements"), // متطلبات العميل
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "paid", "refunded"]).default("unpaid").notNull(),
+  paidAmount: decimal("paidAmount", { precision: 10, scale: 2 }).default("0"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ServiceOrder = typeof serviceOrders.$inferSelect;
+export type InsertServiceOrder = typeof serviceOrders.$inferInsert;
+
+/**
+ * Public course display settings - additional fields for public display
+ */
+export const courseDisplaySettings = mysqlTable("course_display_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull().unique(), // Reference to courses table
+  isPublic: boolean("isPublic").default(false).notNull(), // عرض في الموقع العام
+  courseType: mysqlEnum("courseType", ["online_live", "onsite", "recorded"]).default("online_live").notNull(),
+  imageUrl: text("imageUrl"),
+  shortDescription: varchar("shortDescription", { length: 500 }),
+  detailedDescription: text("detailedDescription"),
+  highlights: text("highlights"), // JSON array of course highlights
+  targetAudience: text("targetAudience"),
+  maxSeats: int("maxSeats"),
+  currentSeats: int("currentSeats").default(0),
+  location: varchar("location", { length: 255 }), // for onsite courses
+  meetingLink: text("meetingLink"), // for online courses
+  videoPreviewUrl: text("videoPreviewUrl"), // for recorded courses
+  thumbnailUrl: text("thumbnailUrl"), // صورة مصغرة للدورة
+  publicPrice: decimal("publicPrice", { precision: 10, scale: 2 }), // السعر الأساسي للعرض العام
+  publicDiscountPrice: decimal("publicDiscountPrice", { precision: 10, scale: 2 }), // السعر بعد الخصم للعرض العام
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CourseDisplaySetting = typeof courseDisplaySettings.$inferSelect;
+export type InsertCourseDisplaySetting = typeof courseDisplaySettings.$inferInsert;
+
+
+// ============================================================
+// RECORDED COURSES SYSTEM (نظام الدورات المسجلة)
+// ============================================================
+
+/**
+ * Recorded courses - main table for recorded/on-demand courses
+ * Instructors submit courses, admin reviews and publishes them
+ */
+export const recordedCourses = mysqlTable("recorded_courses", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 300 }).unique(), // URL-friendly slug
+  instructorId: int("instructorId").notNull(), // Reference to instructors table
+  submittedByUserId: int("submittedByUserId"), // The user who submitted (trainer)
+  category: varchar("category", { length: 100 }), // تصنيف الدورة
+  level: mysqlEnum("level", ["beginner", "intermediate", "advanced", "all_levels"]).default("all_levels").notNull(),
+  language: varchar("language", { length: 50 }).default("العربية"),
+  shortDescription: varchar("shortDescription", { length: 500 }),
+  detailedDescription: text("detailedDescription"),
+  requirements: text("requirements"), // JSON array of prerequisites
+  whatYouLearn: text("whatYouLearn"), // JSON array of learning outcomes
+  thumbnailUrl: text("thumbnailUrl"),
+  promoVideoUrl: text("promoVideoUrl"), // فيديو ترويجي
+  price: decimal("price", { precision: 10, scale: 2 }).notNull().default("0"), // سعر الدورة
+  discountPrice: decimal("discountPrice", { precision: 10, scale: 2 }), // سعر بعد الخصم
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).default("30"), // نسبة عمولة المنصة (%)
+  totalDuration: int("totalDuration").default(0), // إجمالي المدة بالدقائق
+  totalLessons: int("totalLessons").default(0), // إجمالي عدد الدروس
+  // Review workflow
+  status: mysqlEnum("status", [
+    "draft",           // مسودة - المدرب لم يقدمها بعد
+    "pending_review",  // بانتظار المراجعة
+    "changes_requested", // مطلوب تعديلات
+    "approved",        // معتمدة
+    "published",       // منشورة على الموقع
+    "unpublished",     // تم إلغاء النشر
+    "rejected"         // مرفوضة
+  ]).default("draft").notNull(),
+  reviewedBy: int("reviewedBy"), // Admin who reviewed
+  reviewedAt: timestamp("reviewedAt"),
+  reviewNotes: text("reviewNotes"), // ملاحظات المراجعة
+  publishedAt: timestamp("publishedAt"),
+  // Stats (cached, updated periodically)
+  totalEnrollments: int("totalEnrollments").default(0),
+  totalViews: int("totalViews").default(0),
+  averageRating: decimal("averageRating", { precision: 3, scale: 2 }).default("0"),
+  totalRevenue: decimal("totalRevenue", { precision: 12, scale: 2 }).default("0"),
+  isFeatured: boolean("isFeatured").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecordedCourse = typeof recordedCourses.$inferSelect;
+export type InsertRecordedCourse = typeof recordedCourses.$inferInsert;
+
+/**
+ * Recorded course sections - chapters/modules within a recorded course
+ */
+export const recordedCourseSections = mysqlTable("recorded_course_sections", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull(), // Reference to recorded_courses
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecordedCourseSection = typeof recordedCourseSections.$inferSelect;
+export type InsertRecordedCourseSection = typeof recordedCourseSections.$inferInsert;
+
+/**
+ * Recorded course lessons - individual videos/lessons within sections
+ */
+export const recordedCourseLessons = mysqlTable("recorded_course_lessons", {
+  id: int("id").autoincrement().primaryKey(),
+  sectionId: int("sectionId").notNull(), // Reference to recorded_course_sections
+  courseId: int("courseId").notNull(), // Reference to recorded_courses (denormalized for queries)
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  // Lesson type: video, quiz, text
+  lessonType: mysqlEnum("lessonType", ["video", "quiz", "text"]).default("video").notNull(),
+  // Video fields
+  videoUrl: text("videoUrl"), // رابط الفيديو (S3 / YouTube / Vimeo)
+  videoSource: mysqlEnum("videoSource", ["upload", "youtube", "vimeo"]).default("upload"), // مصدر الفيديو
+  duration: int("duration").default(0), // المدة بالثواني
+  // Text content (for text type lessons)
+  textContent: text("textContent"), // محتوى نصي (HTML/Markdown)
+  // Quiz reference
+  quizId: int("quizId"), // Reference to quizzes table
+  sortOrder: int("sortOrder").default(0).notNull(),
+  isFreePreview: boolean("isFreePreview").default(false).notNull(), // معاينة مجانية
+  resourcesUrl: text("resourcesUrl"), // ملفات مرفقة (JSON array of URLs)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecordedCourseLesson = typeof recordedCourseLessons.$inferSelect;
+export type InsertRecordedCourseLesson = typeof recordedCourseLessons.$inferInsert;
+
+/**
+ * Recorded course enrollments - students enrolled in recorded courses
+ */
+export const recordedCourseEnrollments = mysqlTable("recorded_course_enrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull(), // Reference to recorded_courses
+  userId: int("userId"), // Reference to users (if logged in)
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  paidAmount: decimal("paidAmount", { precision: 10, scale: 2 }).notNull().default("0"),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "paid", "refunded"]).default("unpaid").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 50 }), // stripe, manual, free
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  enrolledAt: timestamp("enrolledAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"), // null = lifetime access
+  status: mysqlEnum("status", ["active", "expired", "cancelled", "refunded"]).default("active").notNull(),
+  completionPercentage: decimal("completionPercentage", { precision: 5, scale: 2 }).default("0"),
+  lastAccessedAt: timestamp("lastAccessedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecordedCourseEnrollment = typeof recordedCourseEnrollments.$inferSelect;
+export type InsertRecordedCourseEnrollment = typeof recordedCourseEnrollments.$inferInsert;
+
+/**
+ * Lesson progress - tracks which lessons a student has completed
+ */
+export const lessonProgress = mysqlTable("lesson_progress", {
+  id: int("id").autoincrement().primaryKey(),
+  enrollmentId: int("enrollmentId").notNull(), // Reference to recorded_course_enrollments
+  lessonId: int("lessonId").notNull(), // Reference to recorded_course_lessons
+  courseId: int("courseId").notNull(), // Reference to recorded_courses (denormalized)
+  userId: int("userId"), // Reference to users
+  isCompleted: boolean("isCompleted").default(false).notNull(),
+  watchedSeconds: int("watchedSeconds").default(0), // الوقت المشاهد بالثواني
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LessonProgress = typeof lessonProgress.$inferSelect;
+export type InsertLessonProgress = typeof lessonProgress.$inferInsert;
+
+/**
+ * Recorded course reviews - student ratings and reviews
+ */
+export const recordedCourseReviews = mysqlTable("recorded_course_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull(), // Reference to recorded_courses
+  enrollmentId: int("enrollmentId").notNull(), // Reference to recorded_course_enrollments
+  userId: int("userId"), // Reference to users
+  rating: int("rating").notNull(), // 1-5
+  comment: text("comment"),
+  isApproved: boolean("isApproved").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecordedCourseReview = typeof recordedCourseReviews.$inferSelect;
+export type InsertRecordedCourseReview = typeof recordedCourseReviews.$inferInsert;
+
+/**
+ * Instructor earnings - tracks instructor earnings from recorded courses
+ */
+export const instructorEarnings = mysqlTable("instructor_earnings", {
+  id: int("id").autoincrement().primaryKey(),
+  instructorId: int("instructorId").notNull(), // Reference to instructors
+  courseId: int("courseId").notNull(), // Reference to recorded_courses
+  enrollmentId: int("enrollmentId").notNull(), // Reference to recorded_course_enrollments
+  totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(), // المبلغ الإجمالي
+  platformCommission: decimal("platformCommission", { precision: 10, scale: 2 }).notNull(), // عمولة المنصة
+  instructorAmount: decimal("instructorAmount", { precision: 10, scale: 2 }).notNull(), // نصيب المدرب
+  status: mysqlEnum("status", ["pending", "approved", "paid"]).default("pending").notNull(),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InstructorEarning = typeof instructorEarnings.$inferSelect;
+export type InsertInstructorEarning = typeof instructorEarnings.$inferInsert;
+
+/**
+ * Course view logs - tracks page views for analytics
+ */
+export const courseViewLogs = mysqlTable("course_view_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull(), // Reference to recorded_courses
+  userId: int("userId"), // null for anonymous views
+  viewedAt: timestamp("viewedAt").defaultNow().notNull(),
+  source: varchar("source", { length: 100 }), // direct, search, social, referral
+});
+
+export type CourseViewLog = typeof courseViewLogs.$inferSelect;
+export type InsertCourseViewLog = typeof courseViewLogs.$inferInsert;
+
+
+/**
+ * Payments table - tracks all payment transactions (Tap & Tabby)
+ */
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Reference to users
+  recordedCourseId: int("recordedCourseId").notNull(), // Reference to recorded_courses
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  paymentMethod: mysqlEnum("paymentMethod", ["tap", "tabby"]).notNull(),
+  paymentStatus: mysqlEnum("paymentStatus", ["pending", "completed", "failed", "refunded", "cancelled"]).default("pending").notNull(),
+  externalPaymentId: varchar("externalPaymentId", { length: 255 }), // Tap charge_id or Tabby payment_id
+  externalSessionId: varchar("externalSessionId", { length: 255 }), // Tabby session_id
+  redirectUrl: text("redirectUrl"), // Payment redirect URL
+  metadata: json("metadata"), // Additional payment data
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+
+/**
+ * Course reviews - ratings and reviews for recorded courses
+ */
+export const courseReviews = mysqlTable("course_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  recordedCourseId: int("recordedCourseId").notNull(), // Reference to recorded_courses
+  userId: int("userId").notNull(), // Reference to users
+  rating: int("rating").notNull(), // 1-5 stars
+  reviewText: text("reviewText"),
+  isApproved: boolean("isApproved").default(true).notNull(), // Admin can moderate
+  isVisible: boolean("isVisible").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CourseReview = typeof courseReviews.$inferSelect;
+export type InsertCourseReview = typeof courseReviews.$inferInsert;
+
+/**
+ * Completion certificates - auto-generated when course is completed
+ */
+export const certificates = mysqlTable("certificates", {
+  id: int("id").autoincrement().primaryKey(),
+  enrollmentId: int("enrollmentId").notNull(), // Reference to course_enrollments
+  userId: int("userId").notNull(), // Reference to users
+  recordedCourseId: int("recordedCourseId").notNull(), // Reference to recorded_courses
+  certificateNumber: varchar("certificateNumber", { length: 100 }).notNull().unique(), // Unique cert number
+  studentName: varchar("studentName", { length: 255 }).notNull(),
+  courseName: varchar("courseName", { length: 500 }).notNull(),
+  instructorName: varchar("instructorName", { length: 255 }),
+  completionDate: timestamp("completionDate").notNull(),
+  certificateUrl: text("certificateUrl"), // URL to generated certificate PDF/image
+  issuedAt: timestamp("issuedAt").defaultNow().notNull(),
+});
+
+export type Certificate = typeof certificates.$inferSelect;
+export type InsertCertificate = typeof certificates.$inferInsert;
+
+
+/**
+ * Quizzes - quiz attached to a lesson
+ */
+export const quizzes = mysqlTable("quizzes", {
+  id: int("id").autoincrement().primaryKey(),
+  lessonId: int("lessonId").notNull(), // Reference to recorded_course_lessons
+  courseId: int("courseId").notNull(), // Reference to recorded_courses
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  passingScore: int("passingScore").default(70).notNull(), // نسبة النجاح (%)
+  timeLimit: int("timeLimit"), // الوقت المحدد بالدقائق (null = بدون حد)
+  maxAttempts: int("maxAttempts").default(0), // 0 = unlimited
+  shuffleQuestions: boolean("shuffleQuestions").default(false).notNull(),
+  showCorrectAnswers: boolean("showCorrectAnswers").default(true).notNull(), // عرض الإجابات الصحيحة بعد الانتهاء
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Quiz = typeof quizzes.$inferSelect;
+export type InsertQuiz = typeof quizzes.$inferInsert;
+
+/**
+ * Quiz questions - individual questions in a quiz
+ */
+export const quizQuestions = mysqlTable("quiz_questions", {
+  id: int("id").autoincrement().primaryKey(),
+  quizId: int("quizId").notNull(), // Reference to quizzes
+  questionType: mysqlEnum("questionType", [
+    "multiple_choice",   // اختيار من متعدد
+    "true_false",        // صح أو خطأ
+    "short_answer",      // إجابة قصيرة
+  ]).default("multiple_choice").notNull(),
+  questionText: text("questionText").notNull(), // نص السؤال
+  questionImage: text("questionImage"), // صورة مرفقة بالسؤال (اختياري)
+  explanation: text("explanation"), // شرح الإجابة الصحيحة
+  points: int("points").default(1).notNull(), // عدد النقاط
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type QuizQuestion = typeof quizQuestions.$inferSelect;
+export type InsertQuizQuestion = typeof quizQuestions.$inferInsert;
+
+/**
+ * Quiz answers/options - answer choices for questions
+ */
+export const quizAnswers = mysqlTable("quiz_answers", {
+  id: int("id").autoincrement().primaryKey(),
+  questionId: int("questionId").notNull(), // Reference to quiz_questions
+  answerText: text("answerText").notNull(), // نص الإجابة
+  isCorrect: boolean("isCorrect").default(false).notNull(), // هل هي الإجابة الصحيحة
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type QuizAnswer = typeof quizAnswers.$inferSelect;
+export type InsertQuizAnswer = typeof quizAnswers.$inferInsert;
+
+/**
+ * Quiz attempts - student attempts at quizzes
+ */
+export const quizAttempts = mysqlTable("quiz_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  quizId: int("quizId").notNull(), // Reference to quizzes
+  userId: int("userId").notNull(), // Reference to users
+  enrollmentId: int("enrollmentId").notNull(), // Reference to recorded_course_enrollments
+  score: int("score").default(0).notNull(), // النتيجة (%)
+  totalPoints: int("totalPoints").default(0).notNull(), // إجمالي النقاط المحصلة
+  maxPoints: int("maxPoints").default(0).notNull(), // إجمالي النقاط الممكنة
+  isPassed: boolean("isPassed").default(false).notNull(),
+  answers: json("answers"), // JSON: [{questionId, selectedAnswerId, isCorrect}]
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type InsertQuizAttempt = typeof quizAttempts.$inferInsert;
+
+
+/**
+ * Target alerts - تنبيهات المستهدفات
+ * يتم إنشاء تنبيه تلقائي عند وصول الموظف لـ 80% أو 100% من المستهدف
+ */
+export const targetAlerts = mysqlTable("target_alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  employeeId: int("employeeId").notNull(), // الموظف
+  targetId: int("targetId").notNull(), // المستهدف المرتبط
+  alertType: mysqlEnum("alertType", [
+    "reached_80",   // وصل لـ 80% - تحفيز
+    "reached_100",  // وصل لـ 100% - إنجاز
+  ]).notNull(),
+  percentage: decimal("percentage", { precision: 5, scale: 2 }).notNull(), // النسبة المئوية عند التنبيه
+  targetType: varchar("targetType", { length: 100 }).notNull(), // نوع المستهدف
+  targetValue: decimal("targetValue", { precision: 10, scale: 2 }).notNull(), // القيمة المستهدفة
+  achievedValue: decimal("achievedValue", { precision: 10, scale: 2 }).notNull(), // القيمة المتحققة
+  message: text("message"), // رسالة التنبيه
+  isRead: boolean("isRead").default(false).notNull(), // هل تم قراءة التنبيه
+  notifiedOwner: boolean("notifiedOwner").default(false).notNull(), // هل تم إشعار المالك
+  month: int("month"), // الشهر
+  year: int("year").notNull(), // السنة
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TargetAlert = typeof targetAlerts.$inferSelect;
+export type InsertTargetAlert = typeof targetAlerts.$inferInsert;

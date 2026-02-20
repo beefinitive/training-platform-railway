@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  COUNT(*) as total_stats,\n  COUNT(DISTINCT DATE(date)) as unique_days,\n  SUM(CASE WHEN status = 'approved' THEN CAST(calculated_revenue AS DECIMAL(10,2)) ELSE 0 END) as total_revenue\nFROM daily_stats \nWHERE employee_id = 300001 \nAND MONTH(date) = 1 \nAND YEAR(date) = 2026;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT \n  COUNT(*) as total_stats,\n  COUNT(DISTINCT DATE(date)) as unique_days,\n  SUM(CASE WHEN status = 'approved' THEN CAST(calculated_revenue AS DECIMAL(10,2)) ELSE 0 END) as total_revenue\nFROM daily_stats \nWHERE employee_id = 300001 \nAND MONTH(date) = 1 \nAND YEAR(date) = 2026;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'employee_id' in 'where clause'"
+  ]
+}

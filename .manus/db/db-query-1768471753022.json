@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, name, email, roleId FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, email, roleId FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mohamed Ibrahim",
+      "email": "just2vip@gmail.com",
+      "roleId": "1"
+    },
+    {
+      "id": "2130040",
+      "name": "ايلا",
+      "email": "abayataylabh@gmail.com",
+      "roleId": "3"
+    },
+    {
+      "id": "2130045",
+      "name": "mohd.yes.no@gmail.com",
+      "email": "Mohd.yes.no@gmail.com",
+      "roleId": "4"
+    },
+    {
+      "id": "2220402",
+      "name": "shaima@gmail.com",
+      "email": "shaima@gmail.com",
+      "roleId": "4"
+    },
+    {
+      "id": "2220448",
+      "name": "ghada@beefinitive.com",
+      "email": "ghada@beefinitive.com",
+      "roleId": "4"
+    },
+    {
+      "id": "2220455",
+      "name": "samah@beefinitive.com",
+      "email": "samah@beefinitive.com",
+      "roleId": "4"
+    },
+    {
+      "id": "2250112",
+      "name": "أحمد علي",
+      "email": "ahmed-1768431153018@example.com",
+      "roleId": "1"
+    },
+    {
+      "id": "2250113",
+      "name": "فاطمة محمد",
+      "email": "fatima-1768431154499@example.com",
+      "roleId": "2"
+    },
+    {
+      "id": "2250114",
+      "name": "محمد سالم",
+      "email": "salem-1768431156438@example.com",
+      "roleId": "1"
+    },
+    {
+      "id": "2250115",
+      "name": "علي أحمد",
+      "email": "ali-1768431158819@example.com",
+      "roleId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\troleId\n1\tMohamed Ibrahim\tjust2vip@gmail.com\t1\n2130040\tايلا\tabayataylabh@gmail.com\t3\n2130045\tmohd.yes.no@gmail.com\tMohd.yes.no@gmail.com\t4\n2220402\tshaima@gmail.com\tshaima@gmail.com\t4\n2220448\tghada@beefinitive.com\tghada@beefinitive.com\t4\n2220455\tsamah@beefinitive.com\tsamah@beefinitive.com\t4\n2250112\tأحمد علي\tahmed-1768431153018@example.com\t1\n2250113\tفاطمة محمد\tfatima-1768431154499@example.com\t2\n2250114\tمحمد سالم\tsalem-1768431156438@example.com\t1\n2250115\tعلي أحمد\tali-1768431158819@example.com\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1525
+}

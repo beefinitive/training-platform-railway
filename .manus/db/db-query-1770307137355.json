@@ -1,0 +1,24 @@
+{
+  "query": "SELECT 'users' as table_name, id, name, email, roleId as extra FROM users WHERE name LIKE '%سماح%' OR email LIKE '%samah%'\nUNION ALL\nSELECT 'employees' as table_name, id, name, email, CAST(userId AS CHAR) as extra FROM employees WHERE name LIKE '%سماح%' OR email LIKE '%samah%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT 'users' as table_name, id, name, email, roleId as extra FROM users WHERE name LIKE '%سماح%' OR email LIKE '%samah%'\nUNION ALL\nSELECT 'employees' as table_name, id, name, email, CAST(userId AS CHAR) as extra FROM employees WHERE name LIKE '%سماح%' OR email LIKE '%samah%';",
+  "rows": [
+    {
+      "table_name": "employees",
+      "id": "30002",
+      "name": "سماح سهيل عيسى",
+      "email": "samah.issa2024@gmail.com",
+      "extra": "NULL"
+    },
+    {
+      "table_name": "users",
+      "id": "4320018",
+      "name": "سماح",
+      "email": "samah.issa2024@gmail.com",
+      "extra": "4"
+    }
+  ],
+  "messages": [],
+  "stdout": "table_name\tid\tname\temail\textra\nemployees\t30002\tسماح سهيل عيسى\tsamah.issa2024@gmail.com\tNULL\nusers\t4320018\tسماح\tsamah.issa2024@gmail.com\t4\n",
+  "stderr": "",
+  "execution_time_ms": 1521
+}

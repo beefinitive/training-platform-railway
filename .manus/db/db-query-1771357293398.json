@@ -1,0 +1,250 @@
+{
+  "query": "SELECT id, name, email, loginMethod, roleId, employeeId, status, createdAt FROM users ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, email, loginMethod, roleId, employeeId, status, createdAt FROM users ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mohamed Ibrahim",
+      "email": "just2vip@gmail.com",
+      "loginMethod": "google",
+      "roleId": "1",
+      "employeeId": "90002",
+      "status": "active",
+      "createdAt": "2026-01-06 17:51:29"
+    },
+    {
+      "id": "2370097",
+      "name": "غادة حسن بسيوني",
+      "email": "ghadahassen28@gmail.com",
+      "loginMethod": "password",
+      "roleId": "4",
+      "employeeId": "300001",
+      "status": "active",
+      "createdAt": "2026-01-15 12:18:45"
+    },
+    {
+      "id": "2760033",
+      "name": "دينا نبيل ",
+      "email": "dinanabil@gmail.com",
+      "loginMethod": "password",
+      "roleId": "3",
+      "employeeId": "30007",
+      "status": "active",
+      "createdAt": "2026-01-25 11:11:46"
+    },
+    {
+      "id": "4320018",
+      "name": "سماح",
+      "email": "samah.issa2024@gmail.com",
+      "loginMethod": "password",
+      "roleId": "4",
+      "employeeId": "30002",
+      "status": "active",
+      "createdAt": "2026-02-04 21:06:00"
+    },
+    {
+      "id": "5310045",
+      "name": "أسماء إبراهيم",
+      "email": "asmaasnowwhite@gmail.com",
+      "loginMethod": "password",
+      "roleId": "3",
+      "employeeId": "30003",
+      "status": "active",
+      "createdAt": "2026-02-08 21:59:18"
+    },
+    {
+      "id": "6570031",
+      "name": "أحمد علي",
+      "email": "ahmed-1771308197453@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:03:17"
+    },
+    {
+      "id": "6570032",
+      "name": "فاطمة محمد",
+      "email": "fatima-1771308198949@example.com",
+      "loginMethod": "password",
+      "roleId": "2",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:03:19"
+    },
+    {
+      "id": "6570033",
+      "name": "محمد سالم",
+      "email": "salem-1771308200881@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:03:21"
+    },
+    {
+      "id": "6570034",
+      "name": "علي أحمد",
+      "email": "ali-1771308203317@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:03:23"
+    },
+    {
+      "id": "6570035",
+      "name": "ليلى محمد",
+      "email": "layla-1771308204790@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:03:25"
+    },
+    {
+      "id": "6570036",
+      "name": "Test Employee with Role",
+      "email": "test-role-1771308208056@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:03:28"
+    },
+    {
+      "id": "6570047",
+      "name": "أحمد علي",
+      "email": "ahmed-1771308252097@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:12"
+    },
+    {
+      "id": "6570048",
+      "name": "فاطمة محمد",
+      "email": "fatima-1771308253549@example.com",
+      "loginMethod": "password",
+      "roleId": "2",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:13"
+    },
+    {
+      "id": "6570049",
+      "name": "محمد سالم",
+      "email": "salem-1771308255418@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:15"
+    },
+    {
+      "id": "6570050",
+      "name": "علي أحمد",
+      "email": "ali-1771308257734@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:18"
+    },
+    {
+      "id": "6570051",
+      "name": "ليلى محمد",
+      "email": "layla-1771308259157@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:19"
+    },
+    {
+      "id": "6570052",
+      "name": "Test Employee with Role",
+      "email": "test-role-1771308262332@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:22"
+    },
+    {
+      "id": "6570063",
+      "name": "أحمد علي",
+      "email": "ahmed-1771308298005@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:58"
+    },
+    {
+      "id": "6570064",
+      "name": "فاطمة محمد",
+      "email": "fatima-1771308299502@example.com",
+      "loginMethod": "password",
+      "roleId": "2",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:04:59"
+    },
+    {
+      "id": "6570065",
+      "name": "محمد سالم",
+      "email": "salem-1771308301383@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:05:01"
+    },
+    {
+      "id": "6570066",
+      "name": "علي أحمد",
+      "email": "ali-1771308303714@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:05:04"
+    },
+    {
+      "id": "6570067",
+      "name": "ليلى محمد",
+      "email": "layla-1771308305194@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:05:05"
+    },
+    {
+      "id": "6570068",
+      "name": "Test Employee with Role",
+      "email": "test-role-1771308308394@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:05:08"
+    },
+    {
+      "id": "6570079",
+      "name": "أحمد علي",
+      "email": "ahmed-1771308349280@example.com",
+      "loginMethod": "password",
+      "roleId": "1",
+      "employeeId": "NULL",
+      "status": "active",
+      "createdAt": "2026-02-17 06:05:49"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tloginMethod\troleId\temployeeId\tstatus\tcreatedAt\n1\tMohamed Ibrahim\tjust2vip@gmail.com\tgoogle\t1\t90002\tactive\t2026-01-06 17:51:29\n2370097\tغادة حسن بسيوني\tghadahassen28@gmail.com\tpassword\t4\t300001\tactive\t2026-01-15 12:18:45\n2760033\tدينا نبيل \tdinanabil@gmail.com\tpassword\t3\t30007\tactive\t2026-01-25 11:11:46\n4320018\tسماح\tsamah.issa2024@gmail.com\tpassword\t4\t30002\tactive\t2026-02-04 21:06:00\n5310045\tأسماء إبراهيم\tasmaasnowwhite@gmail.com\tpassword\t3\t30003\tactive\t2026-02-08 21:59:18\n6570031\tأحمد علي\tahmed-1771308197453@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:03:17\n6570032\tفاطمة محمد\tfatima-1771308198949@example.com\tpassword\t2\tNULL\tactive\t2026-02-17 06:03:19\n6570033\tمحمد سالم\tsalem-1771308200881@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:03:21\n6570034\tعلي أحمد\tali-1771308203317@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:03:23\n6570035\tليلى محمد\tlayla-1771308204790@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:03:25\n6570036\tTest Employee with Role\ttest-role-1771308208056@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:03:28\n6570047\tأحمد علي\tahmed-1771308252097@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:04:12\n6570048\tفاطمة محمد\tfatima-1771308253549@example.com\tpassword\t2\tNULL\tactive\t2026-02-17 06:04:13\n6570049\tمحمد سالم\tsalem-1771308255418@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:04:15\n6570050\tعلي أحمد\tali-1771308257734@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:04:18\n6570051\tليلى محمد\tlayla-1771308259157@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:04:19\n6570052\tTest Employee with Role\ttest-role-1771308262332@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:04:22\n6570063\tأحمد علي\tahmed-1771308298005@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:04:58\n6570064\tفاطمة محمد\tfatima-1771308299502@example.com\tpassword\t2\tNULL\tactive\t2026-02-17 06:04:59\n6570065\tمحمد سالم\tsalem-1771308301383@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:05:01\n6570066\tعلي أحمد\tali-1771308303714@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:05:04\n6570067\tليلى محمد\tlayla-1771308305194@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:05:05\n6570068\tTest Employee with Role\ttest-role-1771308308394@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:05:08\n6570079\tأحمد علي\tahmed-1771308349280@example.com\tpassword\t1\tNULL\tactive\t2026-02-17 06:05:49\n",
+  "stderr": "",
+  "execution_time_ms": 1540
+}

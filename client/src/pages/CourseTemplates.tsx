@@ -117,7 +117,7 @@ export default function CourseTemplates() {
 
   const formatDate = (date: string | Date | null) => {
     if (!date) return "-";
-    return new Date(date).toLocaleDateString("ar-SA");
+    return new Date(date).toLocaleDateString("en-US");
   };
 
   return (

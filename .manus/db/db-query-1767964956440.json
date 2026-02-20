@@ -1,0 +1,70 @@
+{
+  "query": "SELECT e.id, e.name, e.email, e.userId FROM employees e WHERE e.userId IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT e.id, e.name, e.email, e.userId FROM employees e WHERE e.userId IS NULL;",
+  "rows": [
+    {
+      "id": "30001",
+      "name": "غادة ",
+      "email": "gaddddda@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30002",
+      "name": "سماح",
+      "email": "ssssamah@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30003",
+      "name": "أسماء",
+      "email": "aaaasma@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30004",
+      "name": "محمد نبيل ",
+      "email": "nabillll@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30005",
+      "name": "محمود",
+      "email": "mahaccount@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30006",
+      "name": "محمود الشيخ",
+      "email": "alshaikh@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30007",
+      "name": "دينا",
+      "email": "dinanabil@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "30008",
+      "name": "شيماء",
+      "email": "shaima@gamil.ocm",
+      "userId": "NULL"
+    },
+    {
+      "id": "30009",
+      "name": "رنا ",
+      "email": "rannno@gmail.com",
+      "userId": "NULL"
+    },
+    {
+      "id": "90002",
+      "name": "محمد",
+      "email": "mohd.yes.no@gmail.com",
+      "userId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tuserId\n30001\tغادة \tgaddddda@gmail.com\tNULL\n30002\tسماح\tssssamah@gmail.com\tNULL\n30003\tأسماء\taaaasma@gmail.com\tNULL\n30004\tمحمد نبيل \tnabillll@gmail.com\tNULL\n30005\tمحمود\tmahaccount@gmail.com\tNULL\n30006\tمحمود الشيخ\talshaikh@gmail.com\tNULL\n30007\tدينا\tdinanabil@gmail.com\tNULL\n30008\tشيماء\tshaima@gamil.ocm\tNULL\n30009\tرنا \trannno@gmail.com\tNULL\n90002\tمحمد\tmohd.yes.no@gmail.com\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1508
+}

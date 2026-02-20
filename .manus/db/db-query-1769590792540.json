@@ -1,0 +1,31 @@
+{
+  "query": "SELECT c.id, c.name, c.startDate, c.endDate, c.status FROM courses c WHERE c.name LIKE '%تسويق%' OR c.name LIKE '%التسويق%' ORDER BY c.startDate DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT c.id, c.name, c.startDate, c.endDate, c.status FROM courses c WHERE c.name LIKE '%تسويق%' OR c.name LIKE '%التسويق%' ORDER BY c.startDate DESC;",
+  "rows": [
+    {
+      "id": "180002",
+      "name": "التسويق الإلكتروني - فبراير 2026",
+      "startDate": "2026-02-26",
+      "endDate": "2026-02-28",
+      "status": "active"
+    },
+    {
+      "id": "150009",
+      "name": "التسويق الإلكتروني",
+      "startDate": "2025-02-02",
+      "endDate": "2025-02-02",
+      "status": "completed"
+    },
+    {
+      "id": "150013",
+      "name": "التسويق الإلكتروني",
+      "startDate": "2025-01-15",
+      "endDate": "2025-01-15",
+      "status": "completed"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tstartDate\tendDate\tstatus\n180002\tالتسويق الإلكتروني - فبراير 2026\t2026-02-26\t2026-02-28\tactive\n150009\tالتسويق الإلكتروني\t2025-02-02\t2025-02-02\tcompleted\n150013\tالتسويق الإلكتروني\t2025-01-15\t2025-01-15\tcompleted\n",
+  "stderr": "",
+  "execution_time_ms": 1543
+}

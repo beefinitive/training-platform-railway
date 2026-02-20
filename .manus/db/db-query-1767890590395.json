@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, name, instructorId FROM courseTemplates;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, instructorId FROM courseTemplates;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "تدريب المدربين ",
+      "instructorId": "NULL"
+    },
+    {
+      "id": "7",
+      "name": "التصوير بالجوال",
+      "instructorId": "1"
+    },
+    {
+      "id": "90001",
+      "name": "تدريب المدربين",
+      "instructorId": "2"
+    },
+    {
+      "id": "90002",
+      "name": "إدارة المشاريع الاحترافية",
+      "instructorId": "30001"
+    },
+    {
+      "id": "90003",
+      "name": "فن الإلقاء",
+      "instructorId": "30002"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tinstructorId\n1\tتدريب المدربين \tNULL\n7\tالتصوير بالجوال\t1\n90001\tتدريب المدربين\t2\n90002\tإدارة المشاريع الاحترافية\t30001\n90003\tفن الإلقاء\t30002\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

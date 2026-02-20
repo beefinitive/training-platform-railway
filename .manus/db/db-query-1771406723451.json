@@ -1,0 +1,54 @@
+{
+  "query": "SELECT 'employees' as tbl, COUNT(*) as cnt FROM employees UNION ALL SELECT 'employeeTargets', COUNT(*) FROM employeeTargets UNION ALL SELECT 'daily_stats', COUNT(*) FROM daily_stats UNION ALL SELECT 'employeeRewards', COUNT(*) FROM employeeRewards UNION ALL SELECT 'recorded_courses', COUNT(*) FROM recorded_courses UNION ALL SELECT 'recorded_course_sections', COUNT(*) FROM recorded_course_sections UNION ALL SELECT 'recorded_course_lessons', COUNT(*) FROM recorded_course_lessons UNION ALL SELECT 'recorded_course_enrollments', COUNT(*) FROM recorded_course_enrollments UNION ALL SELECT 'payments', COUNT(*) FROM payments UNION ALL SELECT 'course_reviews', COUNT(*) FROM course_reviews UNION ALL SELECT 'certificates', COUNT(*) FROM certificates;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT 'employees' as tbl, COUNT(*) as cnt FROM employees UNION ALL SELECT 'employeeTargets', COUNT(*) FROM employeeTargets UNION ALL SELECT 'daily_stats', COUNT(*) FROM daily_stats UNION ALL SELECT 'employeeRewards', COUNT(*) FROM employeeRewards UNION ALL SELECT 'recorded_courses', COUNT(*) FROM recorded_courses UNION ALL SELECT 'recorded_course_sections', COUNT(*) FROM recorded_course_sections UNION ALL SELECT 'recorded_course_lessons', COUNT(*) FROM recorded_course_lessons UNION ALL SELECT 'recorded_course_enrollments', COUNT(*) FROM recorded_course_enrollments UNION ALL SELECT 'payments', COUNT(*) FROM payments UNION ALL SELECT 'course_reviews', COUNT(*) FROM course_reviews UNION ALL SELECT 'certificates', COUNT(*) FROM certificates;",
+  "rows": [
+    {
+      "tbl": "employeeTargets",
+      "cnt": "51"
+    },
+    {
+      "tbl": "daily_stats",
+      "cnt": "80"
+    },
+    {
+      "tbl": "employeeRewards",
+      "cnt": "2"
+    },
+    {
+      "tbl": "employees",
+      "cnt": "9"
+    },
+    {
+      "tbl": "recorded_courses",
+      "cnt": "0"
+    },
+    {
+      "tbl": "recorded_course_lessons",
+      "cnt": "0"
+    },
+    {
+      "tbl": "recorded_course_sections",
+      "cnt": "0"
+    },
+    {
+      "tbl": "payments",
+      "cnt": "0"
+    },
+    {
+      "tbl": "recorded_course_enrollments",
+      "cnt": "0"
+    },
+    {
+      "tbl": "course_reviews",
+      "cnt": "0"
+    },
+    {
+      "tbl": "certificates",
+      "cnt": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\nemployeeTargets\t51\ndaily_stats\t80\nemployeeRewards\t2\nemployees\t9\nrecorded_courses\t0\nrecorded_course_lessons\t0\nrecorded_course_sections\t0\npayments\t0\nrecorded_course_enrollments\t0\ncourse_reviews\t0\ncertificates\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1611
+}

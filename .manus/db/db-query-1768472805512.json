@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM employees WHERE email LIKE '%ghada%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM employees WHERE email LIKE '%ghada%';",
+  "rows": [
+    {
+      "id": "240001",
+      "name": "غادة",
+      "email": "ghada@beefinitive.com",
+      "phone": "NULL",
+      "specialization": "customer_service",
+      "userId": "NULL",
+      "hireDate": "2026-01-14",
+      "salary": "550.00",
+      "workType": "remote",
+      "status": "active",
+      "createdAt": "2026-01-14 21:30:18",
+      "updatedAt": "2026-01-14 23:31:37",
+      "profileImage": "NULL",
+      "nationalId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tphone\tspecialization\tuserId\thireDate\tsalary\tworkType\tstatus\tcreatedAt\tupdatedAt\tprofileImage\tnationalId\n240001\tغادة\tghada@beefinitive.com\tNULL\tcustomer_service\tNULL\t2026-01-14\t550.00\tremote\tactive\t2026-01-14 21:30:18\t2026-01-14 23:31:37\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1654
+}

@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, name, displayName FROM roles LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, displayName FROM roles LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "admin",
+      "displayName": "مدير النظام"
+    },
+    {
+      "id": "2",
+      "name": "supervisor",
+      "displayName": "مشرف"
+    },
+    {
+      "id": "3",
+      "name": "user",
+      "displayName": "مستخدم"
+    },
+    {
+      "id": "30001",
+      "name": "Customer Support",
+      "displayName": "خدمة عملاء "
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tdisplayName\n1\tadmin\tمدير النظام\n2\tsupervisor\tمشرف\n3\tuser\tمستخدم\n30001\tCustomer Support\tخدمة عملاء \n",
+  "stderr": "",
+  "execution_time_ms": 1621
+}

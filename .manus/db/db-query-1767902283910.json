@@ -1,0 +1,59 @@
+{
+  "query": "SELECT \n  ce.id,\n  c.name as course_name,\n  ce.traineeCount,\n  ce.paidAmount,\n  ce.enrollmentDate\nFROM courseEnrollments ce\nLEFT JOIN courses c ON ce.courseId = c.id\nWHERE ce.enrollmentDate >= '2025-02-01' AND ce.enrollmentDate <= '2025-02-28'\nORDER BY ce.enrollmentDate;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT \n  ce.id,\n  c.name as course_name,\n  ce.traineeCount,\n  ce.paidAmount,\n  ce.enrollmentDate\nFROM courseEnrollments ce\nLEFT JOIN courses c ON ce.courseId = c.id\nWHERE ce.enrollmentDate >= '2025-02-01' AND ce.enrollmentDate <= '2025-02-28'\nORDER BY ce.enrollmentDate;",
+  "rows": [
+    {
+      "id": "150019",
+      "course_name": "تدريب المدربين",
+      "traineeCount": "1",
+      "paidAmount": "350.00",
+      "enrollmentDate": "2025-02-02"
+    },
+    {
+      "id": "150018",
+      "course_name": "تدريب المدربين",
+      "traineeCount": "21",
+      "paidAmount": "400.00",
+      "enrollmentDate": "2025-02-02"
+    },
+    {
+      "id": "150021",
+      "course_name": "التسويق الإلكتروني",
+      "traineeCount": "1",
+      "paidAmount": "350.00",
+      "enrollmentDate": "2025-02-02"
+    },
+    {
+      "id": "150020",
+      "course_name": "التسويق الإلكتروني",
+      "traineeCount": "6",
+      "paidAmount": "400.00",
+      "enrollmentDate": "2025-02-02"
+    },
+    {
+      "id": "150023",
+      "course_name": "التصوير بالجوال",
+      "traineeCount": "1",
+      "paidAmount": "400.00",
+      "enrollmentDate": "2025-02-02"
+    },
+    {
+      "id": "150022",
+      "course_name": "التصوير بالجوال",
+      "traineeCount": "8",
+      "paidAmount": "300.00",
+      "enrollmentDate": "2025-02-02"
+    },
+    {
+      "id": "150024",
+      "course_name": "التصوير بالجوال",
+      "traineeCount": "3",
+      "paidAmount": "266.60",
+      "enrollmentDate": "2025-02-02"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcourse_name\ttraineeCount\tpaidAmount\tenrollmentDate\n150019\tتدريب المدربين\t1\t350.00\t2025-02-02\n150018\tتدريب المدربين\t21\t400.00\t2025-02-02\n150021\tالتسويق الإلكتروني\t1\t350.00\t2025-02-02\n150020\tالتسويق الإلكتروني\t6\t400.00\t2025-02-02\n150023\tالتصوير بالجوال\t1\t400.00\t2025-02-02\n150022\tالتصوير بالجوال\t8\t300.00\t2025-02-02\n150024\tالتصوير بالجوال\t3\t266.60\t2025-02-02\n",
+  "stderr": "",
+  "execution_time_ms": 1488
+}

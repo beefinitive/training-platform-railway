@@ -1,0 +1,80 @@
+{
+  "query": "SELECT e.id, e.name, e.specialization, et.id as targetId, et.targetType, et.customName, et.targetValue, et.currentValue, et.baseValue, et.month, et.year, et.status FROM employees e LEFT JOIN employeeTargets et ON e.id = et.employeeId WHERE e.name LIKE '%غادة%' ORDER BY et.month, et.targetType;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT e.id, e.name, e.specialization, et.id as targetId, et.targetType, et.customName, et.targetValue, et.currentValue, et.baseValue, et.month, et.year, et.status FROM employees e LEFT JOIN employeeTargets et ON e.id = et.employeeId WHERE e.name LIKE '%غادة%' ORDER BY et.month, et.targetType;",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "specialization": "customer_service",
+      "targetId": "240001",
+      "targetType": "confirmed_customers",
+      "customName": "العملاء المؤكدين",
+      "targetValue": "35.00",
+      "currentValue": "10.00",
+      "baseValue": "0.00",
+      "month": "1",
+      "year": "2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "specialization": "customer_service",
+      "targetId": "270013",
+      "targetType": "registered_customers",
+      "customName": "NULL",
+      "targetValue": "80.00",
+      "currentValue": "28.00",
+      "baseValue": "0.00",
+      "month": "1",
+      "year": "2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "specialization": "customer_service",
+      "targetId": "270023",
+      "targetType": "targeted_customers",
+      "customName": "NULL",
+      "targetValue": "600.00",
+      "currentValue": "130.00",
+      "baseValue": "0.00",
+      "month": "1",
+      "year": "2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "specialization": "customer_service",
+      "targetId": "270001",
+      "targetType": "sales_amount",
+      "customName": "NULL",
+      "targetValue": "9000.00",
+      "currentValue": "3249.00",
+      "baseValue": "0.00",
+      "month": "1",
+      "year": "2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "specialization": "customer_service",
+      "targetId": "420001",
+      "targetType": "confirmed_customers",
+      "customName": "",
+      "targetValue": "30.00",
+      "currentValue": "0.00",
+      "baseValue": "0.00",
+      "month": "2",
+      "year": "2026",
+      "status": "in_progress"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tspecialization\ttargetId\ttargetType\tcustomName\ttargetValue\tcurrentValue\tbaseValue\tmonth\tyear\tstatus\n300001\tغادة حسن بسيوني\tcustomer_service\t240001\tconfirmed_customers\tالعملاء المؤكدين\t35.00\t10.00\t0.00\t1\t2026\tin_progress\n300001\tغادة حسن بسيوني\tcustomer_service\t270013\tregistered_customers\tNULL\t80.00\t28.00\t0.00\t1\t2026\tin_progress\n300001\tغادة حسن بسيوني\tcustomer_service\t270023\ttargeted_customers\tNULL\t600.00\t130.00\t0.00\t1\t2026\tin_progress\n300001\tغادة حسن بسيوني\tcustomer_service\t270001\tsales_amount\tNULL\t9000.00\t3249.00\t0.00\t1\t2026\tin_progress\n300001\tغادة حسن بسيوني\tcustomer_service\t420001\tconfirmed_customers\t\t30.00\t0.00\t0.00\t2\t2026\tin_progress\n",
+  "stderr": "",
+  "execution_time_ms": 1553
+}

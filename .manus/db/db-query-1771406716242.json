@@ -1,0 +1,26 @@
+{
+  "query": "SELECT 'employees' as tbl, COUNT(*) as cnt FROM employees UNION ALL SELECT 'employeeTargets', COUNT(*) FROM employeeTargets UNION ALL SELECT 'daily_stats', COUNT(*) FROM daily_stats UNION ALL SELECT 'employeeRewards', COUNT(*) FROM employeeRewards;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT 'employees' as tbl, COUNT(*) as cnt FROM employees UNION ALL SELECT 'employeeTargets', COUNT(*) FROM employeeTargets UNION ALL SELECT 'daily_stats', COUNT(*) FROM daily_stats UNION ALL SELECT 'employeeRewards', COUNT(*) FROM employeeRewards;",
+  "rows": [
+    {
+      "tbl": "daily_stats",
+      "cnt": "80"
+    },
+    {
+      "tbl": "employees",
+      "cnt": "9"
+    },
+    {
+      "tbl": "employeeRewards",
+      "cnt": "2"
+    },
+    {
+      "tbl": "employeeTargets",
+      "cnt": "51"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\ndaily_stats\t80\nemployees\t9\nemployeeRewards\t2\nemployeeTargets\t51\n",
+  "stderr": "",
+  "execution_time_ms": 1521
+}

@@ -1,0 +1,370 @@
+{
+  "query": "SELECT * FROM permissions;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM permissions;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "dashboard.view",
+      "displayName": "عرض لوحة التحكم",
+      "module": "dashboard",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:12"
+    },
+    {
+      "id": "2",
+      "name": "courses.view",
+      "displayName": "عرض الدورات",
+      "module": "courses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:12"
+    },
+    {
+      "id": "3",
+      "name": "courses.create",
+      "displayName": "إنشاء دورة",
+      "module": "courses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:12"
+    },
+    {
+      "id": "4",
+      "name": "courses.edit",
+      "displayName": "تعديل دورة",
+      "module": "courses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:12"
+    },
+    {
+      "id": "5",
+      "name": "courses.delete",
+      "displayName": "حذف دورة",
+      "module": "courses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:12"
+    },
+    {
+      "id": "6",
+      "name": "templates.view",
+      "displayName": "عرض قوالب الدورات",
+      "module": "templates",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:13"
+    },
+    {
+      "id": "7",
+      "name": "templates.create",
+      "displayName": "إنشاء قالب",
+      "module": "templates",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:13"
+    },
+    {
+      "id": "8",
+      "name": "templates.edit",
+      "displayName": "تعديل قالب",
+      "module": "templates",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:13"
+    },
+    {
+      "id": "9",
+      "name": "templates.delete",
+      "displayName": "حذف قالب",
+      "module": "templates",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:13"
+    },
+    {
+      "id": "10",
+      "name": "instructors.view",
+      "displayName": "عرض المدربين",
+      "module": "instructors",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:14"
+    },
+    {
+      "id": "11",
+      "name": "instructors.create",
+      "displayName": "إضافة مدرب",
+      "module": "instructors",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:14"
+    },
+    {
+      "id": "12",
+      "name": "instructors.edit",
+      "displayName": "تعديل مدرب",
+      "module": "instructors",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:14"
+    },
+    {
+      "id": "13",
+      "name": "instructors.delete",
+      "displayName": "حذف مدرب",
+      "module": "instructors",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:14"
+    },
+    {
+      "id": "14",
+      "name": "services.view",
+      "displayName": "عرض الخدمات",
+      "module": "services",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:14"
+    },
+    {
+      "id": "15",
+      "name": "services.create",
+      "displayName": "إضافة خدمة",
+      "module": "services",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:15"
+    },
+    {
+      "id": "16",
+      "name": "services.edit",
+      "displayName": "تعديل خدمة",
+      "module": "services",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:15"
+    },
+    {
+      "id": "17",
+      "name": "services.delete",
+      "displayName": "حذف خدمة",
+      "module": "services",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:15"
+    },
+    {
+      "id": "18",
+      "name": "expenses.view",
+      "displayName": "عرض المصروفات التشغيلية",
+      "module": "expenses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:15"
+    },
+    {
+      "id": "19",
+      "name": "expenses.create",
+      "displayName": "إضافة مصروف",
+      "module": "expenses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:15"
+    },
+    {
+      "id": "20",
+      "name": "expenses.edit",
+      "displayName": "تعديل مصروف",
+      "module": "expenses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:16"
+    },
+    {
+      "id": "21",
+      "name": "expenses.delete",
+      "displayName": "حذف مصروف",
+      "module": "expenses",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:16"
+    },
+    {
+      "id": "22",
+      "name": "targets.view",
+      "displayName": "عرض المستهدفات",
+      "module": "targets",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:16"
+    },
+    {
+      "id": "23",
+      "name": "targets.create",
+      "displayName": "إضافة مستهدف",
+      "module": "targets",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:16"
+    },
+    {
+      "id": "24",
+      "name": "targets.edit",
+      "displayName": "تعديل مستهدف",
+      "module": "targets",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:17"
+    },
+    {
+      "id": "25",
+      "name": "targets.delete",
+      "displayName": "حذف مستهدف",
+      "module": "targets",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:17"
+    },
+    {
+      "id": "26",
+      "name": "partnerships.view",
+      "displayName": "عرض الشراكات",
+      "module": "partnerships",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:17"
+    },
+    {
+      "id": "27",
+      "name": "partnerships.create",
+      "displayName": "إضافة شراكة",
+      "module": "partnerships",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:17"
+    },
+    {
+      "id": "28",
+      "name": "partnerships.edit",
+      "displayName": "تعديل شراكة",
+      "module": "partnerships",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:17"
+    },
+    {
+      "id": "29",
+      "name": "partnerships.delete",
+      "displayName": "حذف شراكة",
+      "module": "partnerships",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:18"
+    },
+    {
+      "id": "30",
+      "name": "ideas.view",
+      "displayName": "عرض الأفكار النوعية",
+      "module": "ideas",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:18"
+    },
+    {
+      "id": "31",
+      "name": "ideas.create",
+      "displayName": "إضافة فكرة",
+      "module": "ideas",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:18"
+    },
+    {
+      "id": "32",
+      "name": "ideas.edit",
+      "displayName": "تعديل فكرة",
+      "module": "ideas",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:18"
+    },
+    {
+      "id": "33",
+      "name": "ideas.delete",
+      "displayName": "حذف فكرة",
+      "module": "ideas",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:19"
+    },
+    {
+      "id": "34",
+      "name": "reports.view",
+      "displayName": "عرض التقارير",
+      "module": "reports",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:19"
+    },
+    {
+      "id": "35",
+      "name": "reports.export",
+      "displayName": "تصدير التقارير",
+      "module": "reports",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:19"
+    },
+    {
+      "id": "36",
+      "name": "archive.view",
+      "displayName": "عرض الأرشيف",
+      "module": "archive",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:19"
+    },
+    {
+      "id": "37",
+      "name": "archive.restore",
+      "displayName": "استعادة من الأرشيف",
+      "module": "archive",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:19"
+    },
+    {
+      "id": "38",
+      "name": "archive.delete",
+      "displayName": "حذف نهائي",
+      "module": "archive",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:20"
+    },
+    {
+      "id": "39",
+      "name": "settings.view",
+      "displayName": "عرض الإعدادات",
+      "module": "settings",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:20"
+    },
+    {
+      "id": "40",
+      "name": "settings.edit",
+      "displayName": "تعديل الإعدادات",
+      "module": "settings",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:20"
+    },
+    {
+      "id": "41",
+      "name": "users.view",
+      "displayName": "عرض المستخدمين",
+      "module": "users",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:20"
+    },
+    {
+      "id": "42",
+      "name": "users.create",
+      "displayName": "إضافة مستخدم",
+      "module": "users",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:21"
+    },
+    {
+      "id": "43",
+      "name": "users.edit",
+      "displayName": "تعديل مستخدم",
+      "module": "users",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:21"
+    },
+    {
+      "id": "44",
+      "name": "users.delete",
+      "displayName": "حذف مستخدم",
+      "module": "users",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:21"
+    },
+    {
+      "id": "45",
+      "name": "users.permissions",
+      "displayName": "إدارة الصلاحيات",
+      "module": "users",
+      "description": "NULL",
+      "createdAt": "2026-01-08 22:53:21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tdisplayName\tmodule\tdescription\tcreatedAt\n1\tdashboard.view\tعرض لوحة التحكم\tdashboard\tNULL\t2026-01-08 22:53:12\n2\tcourses.view\tعرض الدورات\tcourses\tNULL\t2026-01-08 22:53:12\n3\tcourses.create\tإنشاء دورة\tcourses\tNULL\t2026-01-08 22:53:12\n4\tcourses.edit\tتعديل دورة\tcourses\tNULL\t2026-01-08 22:53:12\n5\tcourses.delete\tحذف دورة\tcourses\tNULL\t2026-01-08 22:53:12\n6\ttemplates.view\tعرض قوالب الدورات\ttemplates\tNULL\t2026-01-08 22:53:13\n7\ttemplates.create\tإنشاء قالب\ttemplates\tNULL\t2026-01-08 22:53:13\n8\ttemplates.edit\tتعديل قالب\ttemplates\tNULL\t2026-01-08 22:53:13\n9\ttemplates.delete\tحذف قالب\ttemplates\tNULL\t2026-01-08 22:53:13\n10\tinstructors.view\tعرض المدربين\tinstructors\tNULL\t2026-01-08 22:53:14\n11\tinstructors.create\tإضافة مدرب\tinstructors\tNULL\t2026-01-08 22:53:14\n12\tinstructors.edit\tتعديل مدرب\tinstructors\tNULL\t2026-01-08 22:53:14\n13\tinstructors.delete\tحذف مدرب\tinstructors\tNULL\t2026-01-08 22:53:14\n14\tservices.view\tعرض الخدمات\tservices\tNULL\t2026-01-08 22:53:14\n15\tservices.create\tإضافة خدمة\tservices\tNULL\t2026-01-08 22:53:15\n16\tservices.edit\tتعديل خدمة\tservices\tNULL\t2026-01-08 22:53:15\n17\tservices.delete\tحذف خدمة\tservices\tNULL\t2026-01-08 22:53:15\n18\texpenses.view\tعرض المصروفات التشغيلية\texpenses\tNULL\t2026-01-08 22:53:15\n19\texpenses.create\tإضافة مصروف\texpenses\tNULL\t2026-01-08 22:53:15\n20\texpenses.edit\tتعديل مصروف\texpenses\tNULL\t2026-01-08 22:53:16\n21\texpenses.delete\tحذف مصروف\texpenses\tNULL\t2026-01-08 22:53:16\n22\ttargets.view\tعرض المستهدفات\ttargets\tNULL\t2026-01-08 22:53:16\n23\ttargets.create\tإضافة مستهدف\ttargets\tNULL\t2026-01-08 22:53:16\n24\ttargets.edit\tتعديل مستهدف\ttargets\tNULL\t2026-01-08 22:53:17\n25\ttargets.delete\tحذف مستهدف\ttargets\tNULL\t2026-01-08 22:53:17\n26\tpartnerships.view\tعرض الشراكات\tpartnerships\tNULL\t2026-01-08 22:53:17\n27\tpartnerships.create\tإضافة شراكة\tpartnerships\tNULL\t2026-01-08 22:53:17\n28\tpartnerships.edit\tتعديل شراكة\tpartnerships\tNULL\t2026-01-08 22:53:17\n29\tpartnerships.delete\tحذف شراكة\tpartnerships\tNULL\t2026-01-08 22:53:18\n30\tideas.view\tعرض الأفكار النوعية\tideas\tNULL\t2026-01-08 22:53:18\n31\tideas.create\tإضافة فكرة\tideas\tNULL\t2026-01-08 22:53:18\n32\tideas.edit\tتعديل فكرة\tideas\tNULL\t2026-01-08 22:53:18\n33\tideas.delete\tحذف فكرة\tideas\tNULL\t2026-01-08 22:53:19\n34\treports.view\tعرض التقارير\treports\tNULL\t2026-01-08 22:53:19\n35\treports.export\tتصدير التقارير\treports\tNULL\t2026-01-08 22:53:19\n36\tarchive.view\tعرض الأرشيف\tarchive\tNULL\t2026-01-08 22:53:19\n37\tarchive.restore\tاستعادة من الأرشيف\tarchive\tNULL\t2026-01-08 22:53:19\n38\tarchive.delete\tحذف نهائي\tarchive\tNULL\t2026-01-08 22:53:20\n39\tsettings.view\tعرض الإعدادات\tsettings\tNULL\t2026-01-08 22:53:20\n40\tsettings.edit\tتعديل الإعدادات\tsettings\tNULL\t2026-01-08 22:53:20\n41\tusers.view\tعرض المستخدمين\tusers\tNULL\t2026-01-08 22:53:20\n42\tusers.create\tإضافة مستخدم\tusers\tNULL\t2026-01-08 22:53:21\n43\tusers.edit\tتعديل مستخدم\tusers\tNULL\t2026-01-08 22:53:21\n44\tusers.delete\tحذف مستخدم\tusers\tNULL\t2026-01-08 22:53:21\n45\tusers.permissions\tإدارة الصلاحيات\tusers\tNULL\t2026-01-08 22:53:21\n",
+  "stderr": "",
+  "execution_time_ms": 1513
+}

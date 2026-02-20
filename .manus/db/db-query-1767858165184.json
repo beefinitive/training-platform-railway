@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, name, instructorId FROM courseTemplates ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, instructorId FROM courseTemplates ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "تدريب المدربين ",
+      "instructorId": "NULL"
+    },
+    {
+      "id": "2",
+      "name": "Test Template",
+      "instructorId": "1"
+    },
+    {
+      "id": "3",
+      "name": "Test Template",
+      "instructorId": "1"
+    },
+    {
+      "id": "4",
+      "name": "تدريب المدربين",
+      "instructorId": "2"
+    },
+    {
+      "id": "5",
+      "name": "Test Template",
+      "instructorId": "1"
+    },
+    {
+      "id": "6",
+      "name": "Test Template",
+      "instructorId": "1"
+    },
+    {
+      "id": "7",
+      "name": "التصوير بالجوال",
+      "instructorId": "1"
+    },
+    {
+      "id": "30001",
+      "name": "Test Template",
+      "instructorId": "1"
+    },
+    {
+      "id": "30002",
+      "name": "Test Template",
+      "instructorId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tinstructorId\n1\tتدريب المدربين \tNULL\n2\tTest Template\t1\n3\tTest Template\t1\n4\tتدريب المدربين\t2\n5\tTest Template\t1\n6\tTest Template\t1\n7\tالتصوير بالجوال\t1\n30001\tTest Template\t1\n30002\tTest Template\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1500
+}

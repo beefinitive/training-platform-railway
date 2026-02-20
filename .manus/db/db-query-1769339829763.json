@@ -1,0 +1,17 @@
+{
+  "query": "SELECT u.id, u.name, u.email, u.roleId, r.name as roleName \nFROM users u \nLEFT JOIN roles r ON u.roleId = r.id \nWHERE u.email = 'dinanabil@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT u.id, u.name, u.email, u.roleId, r.name as roleName \nFROM users u \nLEFT JOIN roles r ON u.roleId = r.id \nWHERE u.email = 'dinanabil@gmail.com';",
+  "rows": [
+    {
+      "id": "2760033",
+      "name": "دينا نبيل ",
+      "email": "dinanabil@gmail.com",
+      "roleId": "3",
+      "roleName": "user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\troleId\troleName\n2760033\tدينا نبيل \tdinanabil@gmail.com\t3\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 1718
+}

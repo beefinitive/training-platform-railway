@@ -1,0 +1,23 @@
+{
+  "query": "SELECT * FROM users WHERE email = 'mahaccount@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM users WHERE email = 'mahaccount@gmail.com';",
+  "rows": [
+    {
+      "id": "720166",
+      "openId": "pwd_720166",
+      "name": "محمود",
+      "email": "mahaccount@gmail.com",
+      "loginMethod": "password",
+      "createdAt": "2026-01-09 13:23:10",
+      "updatedAt": "2026-01-09 13:32:40",
+      "lastSignedIn": "2026-01-09 13:31:09",
+      "password": "$2b$10$AV25Jpt348FrjfB40CkSwOV1CjpwNYHavBq/gdgnYuHHVzzsQ7Bvy",
+      "roleId": "3",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tloginMethod\tcreatedAt\tupdatedAt\tlastSignedIn\tpassword\troleId\tstatus\n720166\tpwd_720166\tمحمود\tmahaccount@gmail.com\tpassword\t2026-01-09 13:23:10\t2026-01-09 13:32:40\t2026-01-09 13:31:09\t$2b$10$AV25Jpt348FrjfB40CkSwOV1CjpwNYHavBq/gdgnYuHHVzzsQ7Bvy\t3\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1509
+}

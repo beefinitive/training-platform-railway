@@ -1,0 +1,17 @@
+{
+  "query": "SELECT e.id, e.name, e.profileImage, e.userId, u.name as userName \nFROM employees e \nLEFT JOIN users u ON e.userId = u.id \nWHERE e.userId IS NOT NULL \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT e.id, e.name, e.profileImage, e.userId, u.name as userName \nFROM employees e \nLEFT JOIN users u ON e.userId = u.id \nWHERE e.userId IS NOT NULL \nLIMIT 10;",
+  "rows": [
+    {
+      "id": "60001",
+      "name": "شيماء",
+      "profileImage": "NULL",
+      "userId": "660031",
+      "userName": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprofileImage\tuserId\tuserName\n60001\tشيماء\tNULL\t660031\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1629
+}

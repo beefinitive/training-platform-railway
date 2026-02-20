@@ -1,0 +1,82 @@
+{
+  "query": "SELECT id, employeeId, month, year, baseSalary, netSalary FROM monthly_salaries ORDER BY year DESC, month DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, employeeId, month, year, baseSalary, netSalary FROM monthly_salaries ORDER BY year DESC, month DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "2",
+      "employeeId": "30002",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "240.00",
+      "netSalary": "240.00"
+    },
+    {
+      "id": "3",
+      "employeeId": "30003",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "500.00",
+      "netSalary": "500.00"
+    },
+    {
+      "id": "4",
+      "employeeId": "30004",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "400.00",
+      "netSalary": "400.00"
+    },
+    {
+      "id": "5",
+      "employeeId": "30005",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "395.00",
+      "netSalary": "395.00"
+    },
+    {
+      "id": "6",
+      "employeeId": "30006",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "1000.00",
+      "netSalary": "1000.00"
+    },
+    {
+      "id": "7",
+      "employeeId": "30007",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "700.00",
+      "netSalary": "700.00"
+    },
+    {
+      "id": "8",
+      "employeeId": "30008",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "200.00",
+      "netSalary": "200.00"
+    },
+    {
+      "id": "9",
+      "employeeId": "30009",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "240.00",
+      "netSalary": "240.00"
+    },
+    {
+      "id": "1",
+      "employeeId": "30001",
+      "month": "1",
+      "year": "2026",
+      "baseSalary": "550.00",
+      "netSalary": "550.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temployeeId\tmonth\tyear\tbaseSalary\tnetSalary\n2\t30002\t1\t2026\t240.00\t240.00\n3\t30003\t1\t2026\t500.00\t500.00\n4\t30004\t1\t2026\t400.00\t400.00\n5\t30005\t1\t2026\t395.00\t395.00\n6\t30006\t1\t2026\t1000.00\t1000.00\n7\t30007\t1\t2026\t700.00\t700.00\n8\t30008\t1\t2026\t200.00\t200.00\n9\t30009\t1\t2026\t240.00\t240.00\n1\t30001\t1\t2026\t550.00\t550.00\n",
+  "stderr": "",
+  "execution_time_ms": 1693
+}

@@ -1,0 +1,8 @@
+{
+  "query": "SELECT c.id, c.name, c.startDate, c.endDate, \n       (SELECT COUNT(*) FROM courseEnrollments ce WHERE ce.courseId = c.id) as enrollments_count,\n       (SELECT SUM(ce.amount) FROM courseEnrollments ce WHERE ce.courseId = c.id) as total_revenue\nFROM courses c \nWHERE c.name LIKE '%تسويق%' OR c.name LIKE '%التسويق%'\nORDER BY c.startDate DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT c.id, c.name, c.startDate, c.endDate, \n       (SELECT COUNT(*) FROM courseEnrollments ce WHERE ce.courseId = c.id) as enrollments_count,\n       (SELECT SUM(ce.amount) FROM courseEnrollments ce WHERE ce.courseId = c.id) as total_revenue\nFROM courses c \nWHERE c.name LIKE '%تسويق%' OR c.name LIKE '%التسويق%'\nORDER BY c.startDate DESC;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'ce.amount' in 'where clause'"
+  ]
+}

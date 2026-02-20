@@ -376,7 +376,7 @@ export default function DailyReports() {
                           {getEmployeeName(report.employeeId)}
                         </TableCell>
                         <TableCell>
-                          {new Date(report.reportDate).toLocaleDateString("ar-SA")}
+                          {new Date(report.reportDate).toLocaleDateString("en-US")}
                         </TableCell>
                         <TableCell className="text-blue-600 font-medium">
                           {report.targetedCustomers}

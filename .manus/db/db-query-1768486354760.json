@@ -1,0 +1,120 @@
+{
+  "query": "SELECT \n  ce.id, ce.courseId, ce.feeId, ce.traineeCount, ce.paidAmount, ce.dailyStatId,\n  c.name as courseName,\n  cf.name as feeName, cf.amount as feeAmount\nFROM courseEnrollments ce\nLEFT JOIN courses c ON ce.courseId = c.id\nLEFT JOIN courseFees cf ON ce.feeId = cf.id\nWHERE c.name LIKE '%تصوير%'\nORDER BY ce.id DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT \n  ce.id, ce.courseId, ce.feeId, ce.traineeCount, ce.paidAmount, ce.dailyStatId,\n  c.name as courseName,\n  cf.name as feeName, cf.amount as feeAmount\nFROM courseEnrollments ce\nLEFT JOIN courses c ON ce.courseId = c.id\nLEFT JOIN courseFees cf ON ce.feeId = cf.id\nWHERE c.name LIKE '%تصوير%'\nORDER BY ce.id DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "240004",
+      "courseId": "180001",
+      "feeId": "180001",
+      "traineeCount": "1",
+      "paidAmount": "300.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم الأساسية",
+      "feeAmount": "300.00"
+    },
+    {
+      "id": "150029",
+      "courseId": "150002",
+      "feeId": "150004",
+      "traineeCount": "12",
+      "paidAmount": "300.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم الأساسية",
+      "feeAmount": "300.00"
+    },
+    {
+      "id": "150024",
+      "courseId": "150011",
+      "feeId": "150031",
+      "traineeCount": "3",
+      "paidAmount": "266.60",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "رسوم خاصة",
+      "feeAmount": "266.60"
+    },
+    {
+      "id": "150023",
+      "courseId": "150010",
+      "feeId": "150026",
+      "traineeCount": "1",
+      "paidAmount": "400.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "رسوم اخرى ",
+      "feeAmount": "400.00"
+    },
+    {
+      "id": "150022",
+      "courseId": "150010",
+      "feeId": "150028",
+      "traineeCount": "8",
+      "paidAmount": "300.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم الأساسية",
+      "feeAmount": "300.00"
+    },
+    {
+      "id": "150017",
+      "courseId": "150007",
+      "feeId": "150019",
+      "traineeCount": "11",
+      "paidAmount": "300.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم الأساسية",
+      "feeAmount": "300.00"
+    },
+    {
+      "id": "150016",
+      "courseId": "150006",
+      "feeId": "150018",
+      "traineeCount": "3",
+      "paidAmount": "250.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم بعد التخفيض",
+      "feeAmount": "250.00"
+    },
+    {
+      "id": "150015",
+      "courseId": "150006",
+      "feeId": "150017",
+      "traineeCount": "1",
+      "paidAmount": "200.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "عرض خاص",
+      "feeAmount": "200.00"
+    },
+    {
+      "id": "150014",
+      "courseId": "150006",
+      "feeId": "150016",
+      "traineeCount": "7",
+      "paidAmount": "300.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم الأساسية",
+      "feeAmount": "300.00"
+    },
+    {
+      "id": "120015",
+      "courseId": "120007",
+      "feeId": "120017",
+      "traineeCount": "1",
+      "paidAmount": "250.00",
+      "dailyStatId": "NULL",
+      "courseName": "التصوير بالجوال",
+      "feeName": "الرسوم بعد التخفيض",
+      "feeAmount": "250.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcourseId\tfeeId\ttraineeCount\tpaidAmount\tdailyStatId\tcourseName\tfeeName\tfeeAmount\n240004\t180001\t180001\t1\t300.00\tNULL\tالتصوير بالجوال\tالرسوم الأساسية\t300.00\n150029\t150002\t150004\t12\t300.00\tNULL\tالتصوير بالجوال\tالرسوم الأساسية\t300.00\n150024\t150011\t150031\t3\t266.60\tNULL\tالتصوير بالجوال\tرسوم خاصة\t266.60\n150023\t150010\t150026\t1\t400.00\tNULL\tالتصوير بالجوال\tرسوم اخرى \t400.00\n150022\t150010\t150028\t8\t300.00\tNULL\tالتصوير بالجوال\tالرسوم الأساسية\t300.00\n150017\t150007\t150019\t11\t300.00\tNULL\tالتصوير بالجوال\tالرسوم الأساسية\t300.00\n150016\t150006\t150018\t3\t250.00\tNULL\tالتصوير بالجوال\tالرسوم بعد التخفيض\t250.00\n150015\t150006\t150017\t1\t200.00\tNULL\tالتصوير بالجوال\tعرض خاص\t200.00\n150014\t150006\t150016\t7\t300.00\tNULL\tالتصوير بالجوال\tالرسوم الأساسية\t300.00\n120015\t120007\t120017\t1\t250.00\tNULL\tالتصوير بالجوال\tالرسوم بعد التخفيض\t250.00\n",
+  "stderr": "",
+  "execution_time_ms": 1853
+}

@@ -16,7 +16,7 @@ const arabicMonths = [
 ];
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ar-SA', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 0,
@@ -535,8 +535,8 @@ export default function Home() {
                     <TableCell className="font-mono text-sm">{course.code || '-'}</TableCell>
                     <TableCell className="font-medium">{course.name}</TableCell>
                     <TableCell>{course.instructorName}</TableCell>
-                    <TableCell>{course.startDate ? new Date(course.startDate).toLocaleDateString('ar-SA') : '-'}</TableCell>
-                    <TableCell>{course.endDate ? new Date(course.endDate).toLocaleDateString('ar-SA') : '-'}</TableCell>
+                    <TableCell>{course.startDate ? new Date(course.startDate).toLocaleDateString('en-US') : '-'}</TableCell>
+                    <TableCell>{course.endDate ? new Date(course.endDate).toLocaleDateString('en-US') : '-'}</TableCell>
                     <TableCell>{getStatusBadge(course.status || 'active')}</TableCell>
                   </TableRow>
                 ))}
@@ -592,7 +592,7 @@ export default function Home() {
                         {formatCurrency(Number(enrollment.paidAmount) || 0)}
                       </TableCell>
                       <TableCell>
-                        {enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString('ar-SA') : '-'}
+                        {enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString('en-US') : '-'}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
                         {enrollment.notes || '-'}
@@ -763,7 +763,7 @@ export default function Home() {
                           {expense.description || '-'}
                         </TableCell>
                         <TableCell>
-                          {expense.expenseDate ? new Date(expense.expenseDate).toLocaleDateString('ar-SA') : '-'}
+                          {expense.expenseDate ? new Date(expense.expenseDate).toLocaleDateString('en-US') : '-'}
                         </TableCell>
                       </TableRow>
                     ))}

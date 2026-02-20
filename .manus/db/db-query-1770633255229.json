@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO userPermissions (userId, permissionId) VALUES \n(5310045, 30001),\n(5310045, 30002),\n(5310045, 30003);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute INSERT INTO userPermissions (userId, permissionId) VALUES \n(5310045, 30001),\n(5310045, 30002),\n(5310045, 30003);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1530
+}

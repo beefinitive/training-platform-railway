@@ -701,7 +701,7 @@ export default function ProjectDetails() {
                       <TableRow key={revenue.id}>
                         <TableCell className="font-medium">{revenue.description}</TableCell>
                         <TableCell>
-                          {new Date(revenue.revenueDate).toLocaleDateString("ar-SA")}
+                          {new Date(revenue.revenueDate).toLocaleDateString("en-US")}
                         </TableCell>
                         <TableCell>{revenue.category || "-"}</TableCell>
                         <TableCell className="text-green-600 font-semibold">
@@ -859,7 +859,7 @@ export default function ProjectDetails() {
                       <TableRow key={expense.id}>
                         <TableCell className="font-medium">{expense.description}</TableCell>
                         <TableCell>
-                          {new Date(expense.expenseDate).toLocaleDateString("ar-SA")}
+                          {new Date(expense.expenseDate).toLocaleDateString("en-US")}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">

@@ -70,14 +70,14 @@ export default function Attendance() {
 
   const formatTime = (date: Date | string | null) => {
     if (!date) return "-";
-    return new Date(date).toLocaleTimeString("ar-SA", {
+    return new Date(date).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
   };
 
   const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString("ar-SA", {
+    return new Date(date).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -343,7 +343,7 @@ export default function Attendance() {
                         {getEmployeeName(record.employeeId)}
                       </TableCell>
                       <TableCell>
-                        {new Date(record.date).toLocaleDateString("ar-SA")}
+                        {new Date(record.date).toLocaleDateString("en-US")}
                       </TableCell>
                       <TableCell>{formatTime(record.checkIn)}</TableCell>
                       <TableCell>{formatTime(record.checkOut)}</TableCell>

@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM employees WHERE name LIKE '%غادة%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM employees WHERE name LIKE '%غادة%';",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "email": "ghadahassen28@gmail.com",
+      "phone": "01094838450",
+      "specialization": "customer_service",
+      "userId": "2370097",
+      "hireDate": "2022-01-15",
+      "salary": "550.00",
+      "workType": "remote",
+      "status": "active",
+      "createdAt": "2026-01-15 12:19:48",
+      "updatedAt": "2026-01-15 12:27:48",
+      "profileImage": "NULL",
+      "nationalId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tphone\tspecialization\tuserId\thireDate\tsalary\tworkType\tstatus\tcreatedAt\tupdatedAt\tprofileImage\tnationalId\n300001\tغادة حسن بسيوني\tghadahassen28@gmail.com\t01094838450\tcustomer_service\t2370097\t2022-01-15\t550.00\tremote\tactive\t2026-01-15 12:19:48\t2026-01-15 12:27:48\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1505
+}

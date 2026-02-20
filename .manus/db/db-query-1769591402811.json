@@ -1,0 +1,18 @@
+{
+  "query": "SELECT u.id, u.name, u.email, u.employeeId, e.name as employeeName, e.id as empId\nFROM users u\nLEFT JOIN employees e ON u.employeeId = e.id\nWHERE u.email = 'just2vip@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT u.id, u.name, u.email, u.employeeId, e.name as employeeName, e.id as empId\nFROM users u\nLEFT JOIN employees e ON u.employeeId = e.id\nWHERE u.email = 'just2vip@gmail.com';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mohamed Ibrahim",
+      "email": "just2vip@gmail.com",
+      "employeeId": "90002",
+      "employeeName": "محمد",
+      "empId": "90002"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\temployeeId\temployeeName\tempId\n1\tMohamed Ibrahim\tjust2vip@gmail.com\t90002\tمحمد\t90002\n",
+  "stderr": "",
+  "execution_time_ms": 1535
+}

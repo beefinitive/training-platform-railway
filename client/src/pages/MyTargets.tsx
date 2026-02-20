@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { 
   Target, TrendingUp, Award, DollarSign, Calendar, 
   CheckCircle2, Clock, AlertCircle, Trophy, Loader2,
-  Plus, Edit2, Trash2, ClipboardList, Save, BarChart3
+  Plus, Edit2, Trash2, ClipboardList, Save, BarChart3, ShoppingBag
 } from "lucide-react";
 import {
   BarChart,
@@ -116,16 +116,25 @@ export default function MyTargets() {
   const [showDailyStatsDialog, setShowDailyStatsDialog] = useState(false);
   const [editingStatId, setEditingStatId] = useState<number | null>(null);
   
-  // نموذج الإحصائيات اليومية
+  // نموذج الخدمات المباعة المنفصل
+  const [showServicesDialog, setShowServicesDialog] = useState(false);
+  const [servicesForm, setServicesForm] = useState({
+    date: new Date().toISOString().split('T')[0],
+    targetedByServices: "" as string | number, // المستهدفين بالخدمات
+    services: [] as Array<{ templateId: number; templateName: string; price: number; quantity: string | number }>,
+    notes: "",
+  });
+  
+  // نموذج الإحصائيات اليومية - القيم الافتراضية فارغة للسماح بالكتابة مباشرة
   const [dailyStatsForm, setDailyStatsForm] = useState({
     courseId: null as number | null,
     courseFee: 0,
-    confirmedCustomers: 0,
-    registeredCustomers: 0,
-    targetedCustomers: 0,
-    servicesSold: 0,
-    salesAmount: 0,
+    confirmedCustomers: "" as string | number,
+    registeredCustomers: "" as string | number,
+    targetedCustomers: "" as string | number,
     notes: "",
+    // دعم عدة أسعار للدورة الواحدة
+    feeBreakdown: [] as Array<{ feeId: number; feeName: string; feeAmount: number; customerCount: string | number }>,
   });
 
   // الحصول على الموظف المرتبط بالمستخدم الحالي
@@ -142,6 +151,9 @@ export default function MyTargets() {
   
   // جلب قائمة الموظفين دائماً للبحث بالبريد الإلكتروني
   const { data: employees = [], isLoading: employeesLoading } = trpc.employees.list.useQuery();
+  
+  // جلب قوالب الخدمات
+  const { data: serviceTemplates = [] } = trpc.serviceTemplates.list.useQuery();
   
   // الحصول على بيانات الموظف المرتبط بالـ ID
   const { data: linkedEmployee, isLoading: linkedEmployeeLoading } = trpc.employees.getById.useQuery(
@@ -329,12 +341,11 @@ export default function MyTargets() {
     setDailyStatsForm({
       courseId: null,
       courseFee: 0,
-      confirmedCustomers: 0,
-      registeredCustomers: 0,
-      targetedCustomers: 0,
-      servicesSold: 0,
-      salesAmount: 0,
+      confirmedCustomers: "",
+      registeredCustomers: "",
+      targetedCustomers: "",
       notes: "",
+      feeBreakdown: [],
     });
     setSelectedDate(new Date().toISOString().split('T')[0]);
   };
@@ -349,9 +360,8 @@ export default function MyTargets() {
         confirmedCustomers: stat.confirmedCustomers || 0,
         registeredCustomers: stat.registeredCustomers || 0,
         targetedCustomers: stat.targetedCustomers || 0,
-        servicesSold: stat.servicesSold || 0,
-        salesAmount: parseFloat(stat.salesAmount) || 0,
         notes: stat.notes || "",
+        feeBreakdown: stat.feeBreakdown || [],
       });
     } else {
       setEditingStatId(null);
@@ -360,18 +370,101 @@ export default function MyTargets() {
     setShowDailyStatsDialog(true);
   };
 
+  // فتح نموذج الخدمات المباعة المنفصل
+  const handleOpenServicesDialog = () => {
+    setServicesForm({
+      date: new Date().toISOString().split('T')[0],
+      targetedByServices: "",
+      services: [],
+      notes: "",
+    });
+    setShowServicesDialog(true);
+  };
+
+  // حفظ إحصائية الخدمات المنفصلة
+  const handleSaveServices = () => {
+    if (!currentEmployee?.id) return;
+    
+    // التحقق من إدخال المستهدفين بالخدمات (إلزامي)
+    const targetedByServicesValue = Number(servicesForm.targetedByServices) || 0;
+    if (targetedByServicesValue <= 0) {
+      toast.error("يرجى إدخال عدد المستهدفين بالخدمات");
+      return;
+    }
+
+    // حساب عدد الخدمات ومبلغها (اختياري)
+    const totalServicesSold = servicesForm.services.reduce(
+      (sum, s) => sum + (Number(s.quantity) || 0), 0
+    );
+    const totalServicesAmount = servicesForm.services.reduce(
+      (sum, s) => sum + (s.price * (Number(s.quantity) || 0)), 0
+    );
+
+    const formData = {
+      employeeId: currentEmployee.id,
+      date: servicesForm.date,
+      courseId: undefined, // لا توجد دورة - إحصائية خدمات فقط
+      courseFee: 0,
+      confirmedCustomers: 0,
+      registeredCustomers: 0,
+      targetedCustomers: 0,
+      servicesSold: totalServicesSold,
+      targetedByServices: targetedByServicesValue, // المستهدفين بالخدمات
+      salesAmount: totalServicesAmount,
+      notes: servicesForm.notes || `إحصائية خدمات`,
+      calculatedRevenue: 0, // لا يوجد إيراد دورات
+      soldServices: servicesForm.services.length > 0 ? JSON.stringify(servicesForm.services.map(s => ({
+        templateId: s.templateId,
+        templateName: s.templateName,
+        price: s.price,
+        quantity: Number(s.quantity) || 0,
+      }))) : undefined,
+    };
+
+    createDailyStatMutation.mutate(formData, {
+      onSuccess: () => {
+        toast.success("تم حفظ إحصائية الخدمات بنجاح");
+        setShowServicesDialog(false);
+        utils.dailyStats.list.invalidate();
+        utils.dailyStats.monthlyTotal.invalidate();
+      },
+      onError: (error) => {
+        toast.error("حدث خطأ أثناء حفظ الإحصائية");
+        console.error(error);
+      },
+    });
+  };
+
   const handleSaveDailyStat = () => {
     if (!currentEmployee?.id) return;
 
+    // حساب الإيراد المحسوب من feeBreakdown
+    const calculatedRevenue = dailyStatsForm.feeBreakdown.reduce(
+      (sum, fb) => sum + (Number(fb.customerCount) || 0) * fb.feeAmount, 
+      0
+    );
+
+    // تحويل القيم إلى أرقام قبل إرسالها للـ API
     const formData = {
-      confirmedCustomers: dailyStatsForm.confirmedCustomers,
-      registeredCustomers: dailyStatsForm.registeredCustomers,
-      targetedCustomers: dailyStatsForm.targetedCustomers,
-      servicesSold: dailyStatsForm.servicesSold,
-      salesAmount: dailyStatsForm.salesAmount,
+      confirmedCustomers: Number(dailyStatsForm.confirmedCustomers) || 0,
+      registeredCustomers: Number(dailyStatsForm.registeredCustomers) || 0,
+      targetedCustomers: Number(dailyStatsForm.targetedCustomers) || 0,
+      // إحصائية الدورات لا تحتوي على خدمات
+      servicesSold: 0,
+      salesAmount: 0,
       notes: dailyStatsForm.notes,
       courseId: dailyStatsForm.courseId || undefined,
       courseFee: dailyStatsForm.courseFee || undefined,
+      // إرسال تفاصيل الأسعار المتعددة
+      feeBreakdown: dailyStatsForm.feeBreakdown.length > 0 
+        ? JSON.stringify(dailyStatsForm.feeBreakdown.map(fb => ({
+            feeId: fb.feeId,
+            feeName: fb.feeName,
+            feeAmount: fb.feeAmount,
+            customerCount: Number(fb.customerCount) || 0,
+          })))
+        : undefined,
+      calculatedRevenue: calculatedRevenue > 0 ? calculatedRevenue : undefined,
     };
 
     if (editingStatId) {
@@ -555,10 +648,16 @@ export default function MyTargets() {
                       </CardTitle>
                       <CardDescription>إجمالي الإحصائيات اليومية للشهر الحالي</CardDescription>
                     </div>
-                    <Button onClick={() => handleOpenDailyStatsDialog()} className="gap-2">
-                      <Plus className="h-4 w-4" />
-                      إضافة إحصائية يومية
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button onClick={() => handleOpenDailyStatsDialog()} className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        إحصائية دورة
+                      </Button>
+                      <Button onClick={() => handleOpenServicesDialog()} variant="outline" className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        إحصائية خدمات
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -581,17 +680,38 @@ export default function MyTargets() {
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">العملاء المستهدفين</p>
                     </div>
+                    <div className="bg-pink-50 dark:bg-pink-900/20 rounded-lg p-4 text-center">
+                      <p className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+                        {monthlyTotal?.targetedByServices || 0}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">المستهدفين بالخدمات</p>
+                    </div>
                     <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 text-center">
                       <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                         {monthlyTotal?.servicesSold || 0}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">الخدمات المباعة</p>
                     </div>
+                    {/* إيرادات الدورات */}
+                    <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+                        {parseFloat(String(monthlyTotal?.coursesRevenue || 0)).toLocaleString('en-US')} <span className="text-sm">ر.س</span>
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">إيرادات الدورات</p>
+                    </div>
+                    {/* إيرادات الخدمات */}
+                    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                        {parseFloat(String(monthlyTotal?.servicesRevenue || 0)).toLocaleString('en-US')} <span className="text-sm">ر.س</span>
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">إيرادات الخدمات</p>
+                    </div>
+                    {/* إجمالي الإيرادات */}
                     <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 text-center col-span-2">
                       <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                        {parseFloat(String(monthlyTotal?.totalRevenue || 0)).toLocaleString('ar-SA')} <span className="text-lg">ر.س</span>
+                        {parseFloat(String(monthlyTotal?.totalRevenue || 0)).toLocaleString('en-US')} <span className="text-lg">ر.س</span>
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">الإيرادات المحصّلة (مبلغ المبيعات)</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">إجمالي الإيرادات المحصّلة</p>
                     </div>
                   </div>
                   <p className="text-center text-sm text-gray-500 mt-4">
@@ -630,10 +750,12 @@ export default function MyTargets() {
                         <thead className="border-b bg-gray-50 dark:bg-gray-800">
                           <tr>
                             <th className="text-right py-3 px-4">التاريخ</th>
+                            <th className="text-right py-3 px-4">الدورة</th>
                             <th className="text-center py-3 px-4">المؤكدين</th>
                             <th className="text-center py-3 px-4">المسجلين</th>
                             <th className="text-center py-3 px-4">المستهدفين</th>
-                            <th className="text-center py-3 px-4">الخدمات</th>
+                            <th className="text-center py-3 px-4">مستهدفين بالخدمات</th>
+                            <th className="text-center py-3 px-4">الخدمات المباعة</th>
                             <th className="text-center py-3 px-4">الحالة</th>
                             <th className="text-right py-3 px-4">ملاحظات</th>
                             <th className="text-center py-3 px-4">إجراءات</th>
@@ -643,12 +765,21 @@ export default function MyTargets() {
                           {dailyStats.map((stat) => (
                             <tr key={stat.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                               <td className="py-3 px-4 font-medium">
-                                {new Date(stat.date).toLocaleDateString("ar-SA", {
+                                {new Date(stat.date).toLocaleDateString("en-US", {
                                   weekday: "short",
                                   year: "numeric",
                                   month: "short",
                                   day: "numeric",
                                 })}
+                              </td>
+                              <td className="py-3 px-4">
+                                {stat.courseId ? (
+                                  <span className="text-sm text-primary font-medium">
+                                    {courses?.find(c => c.id === stat.courseId)?.name || 'دورة محذوفة'}
+                                  </span>
+                                ) : (
+                                  <span className="text-sm text-gray-400">-</span>
+                                )}
                               </td>
                               <td className="py-3 px-4 text-center">
                                 <span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">
@@ -663,6 +794,11 @@ export default function MyTargets() {
                               <td className="py-3 px-4 text-center">
                                 <span className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-1 rounded">
                                   {stat.targetedCustomers}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-center">
+                                <span className="bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400 px-2 py-1 rounded">
+                                  {stat.targetedByServices || 0}
                                 </span>
                               </td>
                               <td className="py-3 px-4 text-center">
@@ -848,7 +984,7 @@ export default function MyTargets() {
                             <div className="text-center">
                               <p className="text-2xl font-bold text-primary">
                                 {target.targetType === 'sales_amount' 
-                                  ? `${parseFloat(target.currentValue || '0').toLocaleString('ar-SA')} ر.س`
+                                  ? `${parseFloat(target.currentValue || '0').toLocaleString('en-US')} ر.س`
                                   : target.currentValue
                                 }
                               </p>
@@ -858,7 +994,7 @@ export default function MyTargets() {
                             <div className="text-center">
                               <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
                                 {target.targetType === 'sales_amount' 
-                                  ? `${parseFloat(target.targetValue || '0').toLocaleString('ar-SA')} ر.س`
+                                  ? `${parseFloat(target.targetValue || '0').toLocaleString('en-US')} ر.س`
                                   : target.targetValue
                                 }
                               </p>
@@ -922,7 +1058,7 @@ export default function MyTargets() {
                             <td className="py-3 px-4">{reward.reason || "مكافأة أداء"}</td>
                             <td className="py-3 px-4 font-medium">{reward.amount?.toLocaleString()} ر.س</td>
                             <td className="py-3 px-4">
-                              {reward.createdAt ? new Date(reward.createdAt).toLocaleDateString("ar-SA") : "-"}
+                              {reward.createdAt ? new Date(reward.createdAt).toLocaleDateString("en-US") : "-"}
                             </td>
                             <td className="py-3 px-4">
                               <Badge className={rewardStatusColors[reward.status]}>
@@ -963,12 +1099,16 @@ export default function MyTargets() {
                       ...prev,
                       courseId: null,
                       courseFee: 0,
+                      feeBreakdown: [],
+                      confirmedCustomers: "",
                     }));
                   } else {
                     setDailyStatsForm(prev => ({
                       ...prev,
                       courseId: parseInt(value),
-                      courseFee: 0, // سيتم تحديثه عند جلب الرسوم
+                      courseFee: 0,
+                      feeBreakdown: [],
+                      confirmedCustomers: "",
                     }));
                   }
                 }}
@@ -985,35 +1125,83 @@ export default function MyTargets() {
                   ))}
                 </SelectContent>
               </Select>
+              
+              {/* عرض جميع أسعار الدورة مع حقول إدخال لكل سعر */}
               {dailyStatsForm.courseId && selectedCourseFees.length > 0 && (
-                <div className="space-y-2">
-                  <Label>رسوم الدورة</Label>
-                  <Select
-                    value={dailyStatsForm.courseFee.toString()}
-                    onValueChange={(value) => {
-                      setDailyStatsForm(prev => ({
-                        ...prev,
-                        courseFee: parseFloat(value) || 0,
-                      }));
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الرسوم" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedCourseFees.map((fee) => (
-                        <SelectItem key={fee.id} value={fee.amount}>
-                          {fee.name} - {fee.amount} ر.س
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-3 mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                  <Label className="text-sm font-medium">عدد العملاء المؤكدين لكل سعر:</Label>
+                  <div className="space-y-2">
+                    {selectedCourseFees.map((fee) => {
+                      const existingEntry = dailyStatsForm.feeBreakdown.find(fb => fb.feeId === fee.id);
+                      return (
+                        <div key={fee.id} className="flex items-center gap-3 p-2 bg-white dark:bg-gray-700 rounded border">
+                          <div className="flex-1">
+                            <span className="text-sm font-medium">{fee.name}</span>
+                            <span className="text-xs text-gray-500 mr-2">({fee.amount} ر.س)</span>
+                          </div>
+                          <Input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            className="w-24 text-center"
+                            value={existingEntry?.customerCount ?? ""}
+                            onChange={(e) => {
+                              const newValue = e.target.value;
+                              setDailyStatsForm(prev => {
+                                const newBreakdown = prev.feeBreakdown.filter(fb => fb.feeId !== fee.id);
+                                if (newValue !== "" && newValue !== "0") {
+                                  newBreakdown.push({
+                                    feeId: fee.id,
+                                    feeName: fee.name,
+                                    feeAmount: parseFloat(fee.amount),
+                                    customerCount: newValue,
+                                  });
+                                }
+                                // حساب إجمالي العملاء المؤكدين والإيراد
+                                const totalCustomers = newBreakdown.reduce((sum, fb) => sum + (Number(fb.customerCount) || 0), 0);
+                                const totalRevenue = newBreakdown.reduce((sum, fb) => sum + (Number(fb.customerCount) || 0) * fb.feeAmount, 0);
+                                return {
+                                  ...prev,
+                                  feeBreakdown: newBreakdown,
+                                  confirmedCustomers: totalCustomers,
+                                  courseFee: totalRevenue / (totalCustomers || 1), // متوسط السعر
+                                };
+                              });
+                            }}
+                          />
+                          <span className="text-xs text-gray-500 w-20">
+                            {((Number(existingEntry?.customerCount) || 0) * parseFloat(fee.amount)).toLocaleString()} ر.س
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* ملخص الإجمالي */}
+                  {dailyStatsForm.feeBreakdown.length > 0 && (
+                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-green-700 dark:text-green-400">إجمالي العملاء المؤكدين:</span>
+                        <span className="font-bold text-green-700 dark:text-green-400">
+                          {dailyStatsForm.feeBreakdown.reduce((sum, fb) => sum + (Number(fb.customerCount) || 0), 0)} عميل
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="font-medium text-green-700 dark:text-green-400">إجمالي الإيراد المتوقع:</span>
+                        <span className="font-bold text-green-700 dark:text-green-400">
+                          {dailyStatsForm.feeBreakdown.reduce((sum, fb) => sum + (Number(fb.customerCount) || 0) * fb.feeAmount, 0).toLocaleString()} ر.س
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-              {dailyStatsForm.courseId && dailyStatsForm.courseFee > 0 && (
+              
+              {/* عرض الإيراد المتوقع للدورات بدون أسعار متعددة */}
+              {dailyStatsForm.courseId && selectedCourseFees.length === 0 && dailyStatsForm.courseFee > 0 && (
                 <p className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded">
                   رسوم الدورة: {dailyStatsForm.courseFee} ر.س | 
-                  الإيراد المتوقع: {(dailyStatsForm.courseFee * dailyStatsForm.confirmedCustomers).toLocaleString()} ر.س
+                  الإيراد المتوقع: {(dailyStatsForm.courseFee * (Number(dailyStatsForm.confirmedCustomers) || 0)).toLocaleString()} ر.س
                 </p>
               )}
             </div>
@@ -1030,31 +1218,36 @@ export default function MyTargets() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="confirmedCustomers">
-                  {dailyStatsForm.courseId ? 'المؤكدين للتسجيل' : 'العملاء المؤكدين'}
-                </Label>
-                <Input
-                  id="confirmedCustomers"
-                  type="number"
-                  min="0"
-                  value={dailyStatsForm.confirmedCustomers}
-                  onChange={(e) => setDailyStatsForm(prev => ({
-                    ...prev,
-                    confirmedCustomers: parseInt(e.target.value) || 0,
-                  }))}
-                />
-              </div>
+              {/* إخفاء حقل العملاء المؤكدين عند اختيار دورة مع أسعار متعددة */}
+              {!(dailyStatsForm.courseId && selectedCourseFees.length > 0) && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmedCustomers">
+                    {dailyStatsForm.courseId ? 'المؤكدين للتسجيل' : 'العملاء المؤكدين'}
+                  </Label>
+                  <Input
+                    id="confirmedCustomers"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={dailyStatsForm.confirmedCustomers}
+                    onChange={(e) => setDailyStatsForm(prev => ({
+                      ...prev,
+                      confirmedCustomers: e.target.value,
+                    }))}
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="registeredCustomers">العملاء المسجلين</Label>
                 <Input
                   id="registeredCustomers"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={dailyStatsForm.registeredCustomers}
                   onChange={(e) => setDailyStatsForm(prev => ({
                     ...prev,
-                    registeredCustomers: parseInt(e.target.value) || 0,
+                    registeredCustomers: e.target.value,
                   }))}
                 />
               </div>
@@ -1067,42 +1260,14 @@ export default function MyTargets() {
                   id="targetedCustomers"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={dailyStatsForm.targetedCustomers}
                   onChange={(e) => setDailyStatsForm(prev => ({
                     ...prev,
-                    targetedCustomers: parseInt(e.target.value) || 0,
+                    targetedCustomers: e.target.value,
                   }))}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="servicesSold">الخدمات المباعة</Label>
-                <Input
-                  id="servicesSold"
-                  type="number"
-                  min="0"
-                  value={dailyStatsForm.servicesSold}
-                  onChange={(e) => setDailyStatsForm(prev => ({
-                    ...prev,
-                    servicesSold: parseInt(e.target.value) || 0,
-                  }))}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="salesAmount">مبلغ المبيعات (ر.س)</Label>
-              <Input
-                id="salesAmount"
-                type="number"
-                min="0"
-                step="0.01"
-                value={dailyStatsForm.salesAmount}
-                onChange={(e) => setDailyStatsForm(prev => ({
-                  ...prev,
-                  salesAmount: parseFloat(e.target.value) || 0,
-                }))}
-                placeholder="0.00"
-              />
             </div>
 
             <div className="space-y-2">
@@ -1130,6 +1295,181 @@ export default function MyTargets() {
               className="gap-2"
             >
               {(createDailyStatMutation.isPending || updateDailyStatMutation.isPending) ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              حفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Services Dialog - نموذج الخدمات المباعة المنفصل */}
+      <Dialog open={showServicesDialog} onOpenChange={setShowServicesDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingBag className="h-5 w-5 text-primary" />
+              إضافة إحصائية خدمات
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* اختيار التاريخ */}
+            <div className="space-y-2">
+              <Label htmlFor="service-date">التاريخ</Label>
+              <Input
+                id="service-date"
+                type="date"
+                value={servicesForm.date}
+                onChange={(e) => setServicesForm(prev => ({ ...prev, date: e.target.value }))}
+              />
+            </div>
+
+            {/* المستهدفين بالخدمات */}
+            <div className="space-y-2">
+              <Label htmlFor="targeted-by-services" className="flex items-center gap-1">
+                المستهدفين بالخدمات
+                <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="targeted-by-services"
+                type="number"
+                min="1"
+                placeholder="أدخل عدد المستهدفين"
+                value={servicesForm.targetedByServices}
+                onChange={(e) => setServicesForm(prev => ({ ...prev, targetedByServices: e.target.value }))}
+                required
+              />
+              <p className="text-xs text-gray-500">عدد العملاء الذين تم استهدافهم بالخدمات (إلزامي)</p>
+            </div>
+
+            {/* قسم الخدمات المباعة */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold">الخدمات المباعة <span className="text-xs text-gray-400 font-normal">(اختياري)</span></Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setServicesForm(prev => ({
+                      ...prev,
+                      services: [...prev.services, { templateId: 0, templateName: '', price: 0, quantity: '' }],
+                    }));
+                  }}
+                >
+                  <Plus className="h-4 w-4 ml-1" />
+                  إضافة خدمة
+                </Button>
+              </div>
+              
+              {servicesForm.services.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">لم يتم إضافة خدمات بعد</p>
+              ) : (
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {servicesForm.services.map((service, index) => (
+                    <div key={index} className="flex gap-2 items-end bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                      <div className="flex-1 space-y-1">
+                        <Label className="text-xs">الخدمة</Label>
+                        <Select
+                          value={service.templateId ? String(service.templateId) : ''}
+                          onValueChange={(value) => {
+                            const template = serviceTemplates.find(t => t.id === Number(value));
+                            if (template) {
+                              const newServices = [...servicesForm.services];
+                              newServices[index] = {
+                                templateId: template.id,
+                                templateName: template.serviceName,
+                                price: parseFloat(String(template.price)),
+                                quantity: service.quantity || 1,
+                              };
+                              setServicesForm(prev => ({ ...prev, services: newServices }));
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="bg-white dark:bg-gray-900">
+                            <SelectValue placeholder="اختر خدمة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {serviceTemplates.map((template) => (
+                              <SelectItem key={template.id} value={String(template.id)}>
+                                {template.serviceName} - {parseFloat(String(template.price)).toLocaleString('en-US')} ر.س
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="w-20 space-y-1">
+                        <Label className="text-xs">الكمية</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="1"
+                          value={service.quantity}
+                          onChange={(e) => {
+                            const newServices = [...servicesForm.services];
+                            newServices[index] = { ...service, quantity: e.target.value };
+                            setServicesForm(prev => ({ ...prev, services: newServices }));
+                          }}
+                          className="bg-white dark:bg-gray-900"
+                        />
+                      </div>
+                      <div className="w-24 space-y-1">
+                        <Label className="text-xs">الإجمالي</Label>
+                        <div className="h-9 flex items-center px-2 bg-gray-100 dark:bg-gray-700 rounded-md text-sm font-medium">
+                          {(service.price * (Number(service.quantity) || 0)).toLocaleString('en-US')} ر.س
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          const newServices = servicesForm.services.filter((_, i) => i !== index);
+                          setServicesForm(prev => ({ ...prev, services: newServices }));
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  {/* إجمالي الخدمات */}
+                  <div className="flex justify-between items-center pt-2 border-t">
+                    <span className="text-sm font-medium">إجمالي الخدمات: {servicesForm.services.reduce((sum, s) => sum + (Number(s.quantity) || 0), 0)}</span>
+                    <span className="text-sm font-bold text-primary">
+                      إجمالي المبلغ: {servicesForm.services.reduce((sum, s) => sum + (s.price * (Number(s.quantity) || 0)), 0).toLocaleString('en-US')} ر.س
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="service-notes">ملاحظات (اختياري)</Label>
+              <Textarea
+                id="service-notes"
+                value={servicesForm.notes}
+                onChange={(e) => setServicesForm(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="أي ملاحظات إضافية..."
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowServicesDialog(false)}>
+              إلغاء
+            </Button>
+            <Button 
+              onClick={handleSaveServices}
+              disabled={createDailyStatMutation.isPending}
+              className="gap-2"
+            >
+              {createDailyStatMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Save className="h-4 w-4" />

@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO employeeTargets (employeeId, targetType, targetValue, currentValue, year, month, period, status, createdAt, updatedAt)\nVALUES \n(90002, 'confirmed_customers', 50, 30, 2026, 1, 'monthly', 'in_progress', NOW(), NOW()),\n(90002, 'sales_amount', 15000, 8500, 2026, 1, 'monthly', 'in_progress', NOW(), NOW()),\n(90002, 'registered_customers', 100, 75, 2026, 1, 'monthly', 'in_progress', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute INSERT INTO employeeTargets (employeeId, targetType, targetValue, currentValue, year, month, period, status, createdAt, updatedAt)\nVALUES \n(90002, 'confirmed_customers', 50, 30, 2026, 1, 'monthly', 'in_progress', NOW(), NOW()),\n(90002, 'sales_amount', 15000, 8500, 2026, 1, 'monthly', 'in_progress', NOW(), NOW()),\n(90002, 'registered_customers', 100, 75, 2026, 1, 'monthly', 'in_progress', NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1574
+}

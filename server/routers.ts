@@ -1,6 +1,8 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { recordedCoursesRouter } from "./routers/recordedCourses";
+import { paymentsRouter, reviewsRouter, certificatesRouter } from "./routers/payments";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
@@ -129,6 +131,7 @@ export const appRouter = router({
         courseId: z.number(),
         name: z.string().min(1),
         amount: z.string(),
+        originalPrice: z.string().optional(),
         description: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -136,6 +139,7 @@ export const appRouter = router({
           courseId: input.courseId,
           name: input.name,
           amount: input.amount,
+          originalPrice: input.originalPrice,
           description: input.description,
         });
         return { id };
@@ -146,6 +150,7 @@ export const appRouter = router({
         id: z.number(),
         name: z.string().min(1).optional(),
         amount: z.string().optional(),
+        originalPrice: z.string().nullable().optional(),
         description: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -792,6 +797,24 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.deleteStrategicTarget(input.id);
         return { success: true };
+      }),
+
+    // Get actuals for a specific period (monthly or quarterly)
+    getActualsByPeriod: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        periodType: z.enum(['monthly', 'quarterly']),
+        periodValue: z.number().min(1).max(12),
+      }))
+      .query(async ({ input }) => {
+        return db.getStrategicTargetActualsByPeriod(input.year, input.periodType, input.periodValue);
+      }),
+
+    // Get targets with all period breakdowns
+    getWithPeriods: protectedProcedure
+      .input(z.object({ year: z.number() }))
+      .query(async ({ input }) => {
+        return db.getStrategicTargetsWithPeriods(input.year);
       }),
   }),
 
@@ -2187,11 +2210,15 @@ export const appRouter = router({
         courseId: z.number().optional(), // ربط بالدورة
         date: z.string(),
         confirmedCustomers: z.number().default(0),
-        courseFee: z.number().optional(), // رسوم الدورة
+        courseFee: z.number().optional(), // رسوم الدورة (متوسط السعر عند وجود أسعار متعددة)
+        feeBreakdown: z.string().optional(), // تفاصيل الأسعار المتعددة (JSON)
+        calculatedRevenue: z.number().optional(), // الإيراد المحسوب
         registeredCustomers: z.number().default(0),
         targetedCustomers: z.number().default(0),
         servicesSold: z.number().default(0),
+        targetedByServices: z.number().default(0), // المستهدفين بالخدمات
         salesAmount: z.number().default(0),
+        soldServices: z.string().optional(), // تفاصيل الخدمات المباعة (JSON)
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -2201,10 +2228,13 @@ export const appRouter = router({
           date: new Date(input.date),
           confirmedCustomers: input.confirmedCustomers,
           courseFee: input.courseFee ? String(input.courseFee) : undefined,
+          feeBreakdown: input.feeBreakdown,
           registeredCustomers: input.registeredCustomers,
           targetedCustomers: input.targetedCustomers,
           servicesSold: input.servicesSold,
+          targetedByServices: input.targetedByServices,
           salesAmount: String(input.salesAmount),
+          soldServices: input.soldServices,
           notes: input.notes,
         });
         return { id };
@@ -2219,15 +2249,19 @@ export const appRouter = router({
         registeredCustomers: z.number().optional(),
         targetedCustomers: z.number().optional(),
         servicesSold: z.number().optional(),
+        targetedByServices: z.number().optional(), // المستهدفين بالخدمات
         salesAmount: z.number().optional(),
+        soldServices: z.string().optional(), // تفاصيل الخدمات المباعة (JSON)
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const { id, salesAmount, courseFee, ...rest } = input;
+        const { id, salesAmount, courseFee, soldServices, targetedByServices, ...rest } = input;
         const data = {
           ...rest,
           ...(salesAmount !== undefined ? { salesAmount: String(salesAmount) } : {}),
           ...(courseFee !== undefined ? { courseFee: String(courseFee) } : {}),
+          ...(soldServices !== undefined ? { soldServices } : {}),
+          ...(targetedByServices !== undefined ? { targetedByServices } : {}),
         };
         await db.updateDailyStatWithSync(id, data);
         return { success: true };
@@ -2302,6 +2336,17 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         await db.bulkApproveDailyStats(input.ids, ctx.user?.id || 0, input.reviewNotes);
+        return { success: true };
+      }),
+
+    // إلغاء الموافقة على الإحصائية
+    unapprove: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        reviewNotes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.unapproveDailyStat(input.id, ctx.user?.id || 0, input.reviewNotes);
         return { success: true };
       }),
 
@@ -2417,34 +2462,171 @@ export const appRouter = router({
       }),
   }),
 
-  // ============ TEMPORARY ADMIN ENDPOINT (DELETE AFTER USE) ============
-  tempAdmin: router({
-    resetPasswordByEmail: publicProcedure
+  // ============ COURSE DISPLAY SETTINGS ============
+  courseDisplaySettings: router({
+    get: protectedProcedure
+      .input(z.object({ courseId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getCourseDisplaySettings(input.courseId);
+      }),
+    upsert: protectedProcedure
       .input(z.object({
-        email: z.string().email(),
-        newPassword: z.string().min(1),
-        secret: z.string(), // Simple secret key for security
+        courseId: z.number(),
+        isPublic: z.boolean().optional(),
+        courseType: z.enum(["online_live", "onsite", "recorded"]).optional(),
+        imageUrl: z.string().nullable().optional(),
+        shortDescription: z.string().nullable().optional(),
+        detailedDescription: z.string().nullable().optional(),
+        highlights: z.string().nullable().optional(),
+        targetAudience: z.string().nullable().optional(),
+        maxSeats: z.number().nullable().optional(),
+        currentSeats: z.number().nullable().optional(),
+        location: z.string().nullable().optional(),
+        meetingLink: z.string().nullable().optional(),
+        videoPreviewUrl: z.string().nullable().optional(),
+        thumbnailUrl: z.string().nullable().optional(),
+        publicPrice: z.string().nullable().optional(),
+        publicDiscountPrice: z.string().nullable().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Simple security check
-        if (input.secret !== 'reset_pwd_2024') {
-          throw new Error('Invalid secret key');
+        const { courseId, ...data } = input;
+        
+        // Upload thumbnail if it's a base64 data URL
+        if (data.thumbnailUrl && data.thumbnailUrl.startsWith('data:')) {
+          try {
+            const { storagePut } = await import('./storage');
+            const matches = data.thumbnailUrl.match(/^data:([^;]+);base64,(.+)$/);
+            if (matches) {
+              const contentType = matches[1];
+              const base64Data = matches[2];
+              const buffer = Buffer.from(base64Data, 'base64');
+              const extension = contentType.split('/')[1] || 'png';
+              const fileName = `courses/thumbnails/${courseId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
+              const result = await storagePut(fileName, buffer, contentType);
+              data.thumbnailUrl = result.url;
+            }
+          } catch (error) {
+            console.error('Failed to upload course thumbnail:', error);
+            data.thumbnailUrl = undefined;
+          }
         }
         
-        // Find user by email
-        const user = await db.getUserByEmail(input.email);
-        if (!user) {
-          throw new Error('User not found');
-        }
-        
-        // Reset password without admin check
-        await db.adminChangePassword(user.id, input.newPassword, 0, false);
-        
-        return { 
-          success: true, 
-          message: `Password updated for ${input.email}`,
-          userId: user.id 
-        };
+        const id = await db.upsertCourseDisplaySettings(courseId, data);
+        return { success: true, id };
+      }),
+  }),
+
+  // ============ PUBLIC COURSES (no auth required) ============
+  publicCourses: router({
+    list: publicProcedure.query(async () => {
+      return db.listPublicCourses();
+    }),
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getPublicCourseById(input.id);
+      }),
+    register: publicProcedure
+      .input(z.object({
+        courseId: z.number(),
+        fullName: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().min(1),
+        city: z.string().optional(),
+        organization: z.string().optional(),
+        notes: z.string().optional(),
+        source: z.string().optional(),
+        feeId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const id = await db.createPublicRegistration(input);
+        return { success: true, id };
+      }),
+    listRegistrations: protectedProcedure
+      .input(z.object({ courseId: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.listPublicRegistrations(input.courseId);
+      }),
+  }),
+
+  // ============ PUBLIC SERVICES (no auth required) ============
+  publicServices: router({
+    list: publicProcedure.query(async () => {
+      return db.listActivePublicServices();
+    }),
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getPublicServiceById(input.id);
+      }),
+    order: publicProcedure
+      .input(z.object({
+        serviceId: z.number(),
+        fullName: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().min(1),
+        organization: z.string().optional(),
+        requirements: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const id = await db.createServiceOrder(input);
+        return { success: true, id };
+      }),
+    listOrders: protectedProcedure
+      .input(z.object({ serviceId: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.listServiceOrders(input.serviceId);
+      }),
+  }),
+  recordedCourses: recordedCoursesRouter,
+  payments: paymentsRouter,
+  reviews: reviewsRouter,
+  certificates: certificatesRouter,
+
+  // ============ TARGET ALERTS - تنبيهات المستهدفات ============
+  targetAlerts: router({
+    list: protectedProcedure
+      .input(z.object({
+        employeeId: z.number().optional(),
+        alertType: z.string().optional(),
+        isRead: z.boolean().optional(),
+        month: z.number().optional(),
+        year: z.number().optional(),
+        limit: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.listTargetAlerts(input || {});
+      }),
+
+    unreadCount: protectedProcedure
+      .input(z.object({
+        employeeId: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getUnreadAlertCount(input?.employeeId);
+      }),
+
+    markAsRead: protectedProcedure
+      .input(z.object({ alertId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.markAlertAsRead(input.alertId);
+        return { success: true };
+      }),
+
+    markAllAsRead: protectedProcedure
+      .input(z.object({
+        employeeId: z.number().optional(),
+      }).optional())
+      .mutation(async ({ input }) => {
+        await db.markAllAlertsAsRead(input?.employeeId);
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ alertId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteTargetAlert(input.alertId);
+        return { success: true };
       }),
   }),
 });

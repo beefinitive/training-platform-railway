@@ -1,0 +1,142 @@
+{
+  "query": "SELECT et.id, et.employeeId, e.name as employeeName, et.targetType, et.targetValue, et.currentValue, et.year, et.month, et.status\nFROM employeeTargets et\nJOIN employees e ON et.employeeId = e.id\nWHERE et.year = 2026 AND et.month = 1\nORDER BY e.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT et.id, et.employeeId, e.name as employeeName, et.targetType, et.targetValue, et.currentValue, et.year, et.month, et.status\nFROM employeeTargets et\nJOIN employees e ON et.employeeId = e.id\nWHERE et.year = 2026 AND et.month = 1\nORDER BY e.name;",
+  "rows": [
+    {
+      "id": "300001",
+      "employeeId": "390001",
+      "employeeName": "Test WPForms Employee",
+      "targetType": "confirmed_customers",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300002",
+      "employeeId": "390001",
+      "employeeName": "Test WPForms Employee",
+      "targetType": "registered_customers",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300003",
+      "employeeId": "390001",
+      "employeeName": "Test WPForms Employee",
+      "targetType": "sales_amount",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300004",
+      "employeeId": "390001",
+      "employeeName": "Test WPForms Employee",
+      "targetType": "other",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300005",
+      "employeeId": "390002",
+      "employeeName": "Webhook Test Employee",
+      "targetType": "confirmed_customers",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300006",
+      "employeeId": "390002",
+      "employeeName": "Webhook Test Employee",
+      "targetType": "registered_customers",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300007",
+      "employeeId": "390002",
+      "employeeName": "Webhook Test Employee",
+      "targetType": "sales_amount",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "300008",
+      "employeeId": "390002",
+      "employeeName": "Webhook Test Employee",
+      "targetType": "other",
+      "targetValue": "0.00",
+      "currentValue": "0.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "240001",
+      "employeeId": "300001",
+      "employeeName": "غادة حسن بسيوني",
+      "targetType": "confirmed_customers",
+      "targetValue": "35.00",
+      "currentValue": "10.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "270001",
+      "employeeId": "300001",
+      "employeeName": "غادة حسن بسيوني",
+      "targetType": "sales_amount",
+      "targetValue": "9000.00",
+      "currentValue": "3249.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "270013",
+      "employeeId": "300001",
+      "employeeName": "غادة حسن بسيوني",
+      "targetType": "registered_customers",
+      "targetValue": "80.00",
+      "currentValue": "28.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    },
+    {
+      "id": "270023",
+      "employeeId": "300001",
+      "employeeName": "غادة حسن بسيوني",
+      "targetType": "targeted_customers",
+      "targetValue": "600.00",
+      "currentValue": "130.00",
+      "year": "2026",
+      "month": "1",
+      "status": "in_progress"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temployeeId\temployeeName\ttargetType\ttargetValue\tcurrentValue\tyear\tmonth\tstatus\n300001\t390001\tTest WPForms Employee\tconfirmed_customers\t0.00\t0.00\t2026\t1\tin_progress\n300002\t390001\tTest WPForms Employee\tregistered_customers\t0.00\t0.00\t2026\t1\tin_progress\n300003\t390001\tTest WPForms Employee\tsales_amount\t0.00\t0.00\t2026\t1\tin_progress\n300004\t390001\tTest WPForms Employee\tother\t0.00\t0.00\t2026\t1\tin_progress\n300005\t390002\tWebhook Test Employee\tconfirmed_customers\t0.00\t0.00\t2026\t1\tin_progress\n300006\t390002\tWebhook Test Employee\tregistered_customers\t0.00\t0.00\t2026\t1\tin_progress\n300007\t390002\tWebhook Test Employee\tsales_amount\t0.00\t0.00\t2026\t1\tin_progress\n300008\t390002\tWebhook Test Employee\tother\t0.00\t0.00\t2026\t1\tin_progress\n240001\t300001\tغادة حسن بسيوني\tconfirmed_customers\t35.00\t10.00\t2026\t1\tin_progress\n270001\t300001\tغادة حسن بسيوني\tsales_amount\t9000.00\t3249.00\t2026\t1\tin_progress\n270013\t300001\tغادة حسن بسيوني\tregistered_customers\t80.00\t28.00\t2026\t1\tin_progress\n270023\t300001\tغادة حسن بسيوني\ttargeted_customers\t600.00\t130.00\t2026\t1\tin_progress\n",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

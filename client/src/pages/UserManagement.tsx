@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
+import DailyStatsReview from "./DailyStatsReview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Trash2, Lock, Unlock, Shield, Search, Plus, Loader2, Users, Settings } from "lucide-react";
+import { AlertCircle, Trash2, Lock, Unlock, Shield, Search, Plus, Loader2, Users, ClipboardCheck, KeyRound, Eye, EyeOff } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -32,7 +33,7 @@ import { toast } from "sonner";
 export default function UserManagement() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"users" | "permissions">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "permissions" | "stats-review">("users");
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [confirmStep, setConfirmStep] = useState<number>(0);
@@ -47,6 +48,13 @@ export default function UserManagement() {
     roleId: 3, // Default to user role
   });
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<Set<number>>(new Set());
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordChangeUserId, setPasswordChangeUserId] = useState<number | null>(null);
+  const [passwordChangeUserName, setPasswordChangeUserName] = useState("");
+  const [adminNewPw, setAdminNewPw] = useState("");
+  const [adminConfirmPw, setAdminConfirmPw] = useState("");
+  const [showAdminPw, setShowAdminPw] = useState(false);
+  const [showAdminConfirmPw, setShowAdminConfirmPw] = useState(false);
 
   // Redirect if not admin
   useEffect(() => {
@@ -93,6 +101,19 @@ export default function UserManagement() {
       }
     },
   });
+  const adminChangePasswordMutation = trpc.passwords.adminChangePassword.useMutation({
+    onSuccess: () => {
+      toast.success("تم تغيير كلمة المرور بنجاح");
+      setAdminNewPw("");
+      setAdminConfirmPw("");
+      setShowPasswordDialog(false);
+      setPasswordChangeUserId(null);
+    },
+    onError: (error) => {
+      toast.error("خطأ: " + error.message);
+    },
+  });
+
   const createUserMutation = trpc.userPermissions.createUserWithPermissions.useMutation({
     onSuccess: () => {
       setNewUserData({ name: "", email: "", password: "", roleId: 3 });
@@ -399,8 +420,8 @@ export default function UserManagement() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "users" | "permissions")}>
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "users" | "permissions" | "stats-review")}>
+          <TabsList className="grid w-full max-w-2xl grid-cols-3">
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               قائمة المستخدمين
@@ -408,6 +429,10 @@ export default function UserManagement() {
             <TabsTrigger value="permissions" className="gap-2">
               <Shield className="h-4 w-4" />
               إدارة الصلاحيات
+            </TabsTrigger>
+            <TabsTrigger value="stats-review" className="gap-2">
+              <ClipboardCheck className="h-4 w-4" />
+              مراجعة الإحصائيات
             </TabsTrigger>
           </TabsList>
 
@@ -548,6 +573,23 @@ export default function UserManagement() {
                                     title="إدارة الصلاحيات"
                                   >
                                     <Shield className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setPasswordChangeUserId(u.id);
+                                      setPasswordChangeUserName(u.name || u.email);
+                                      setAdminNewPw("");
+                                      setAdminConfirmPw("");
+                                      setShowAdminPw(false);
+                                      setShowAdminConfirmPw(false);
+                                      setShowPasswordDialog(true);
+                                    }}
+                                    className="text-amber-600 hover:text-amber-700"
+                                    title="تغيير كلمة المرور"
+                                  >
+                                    <KeyRound className="w-4 h-4" />
                                   </Button>
                                 </div>
                               </td>
@@ -732,8 +774,114 @@ export default function UserManagement() {
               </div>
             </div>
           </TabsContent>
+
+          {/* Stats Review Tab */}
+          <TabsContent value="stats-review" className="mt-6">
+            <DailyStatsReview embedded={true} />
+          </TabsContent>
         </Tabs>
       </div>
+      {/* Password Change Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-amber-600" />
+              تغيير كلمة المرور
+            </DialogTitle>
+            <DialogDescription>
+              تغيير كلمة مرور المستخدم: <strong>{passwordChangeUserName}</strong>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="dialog-new-pw">كلمة المرور الجديدة</Label>
+              <div className="relative">
+                <Input
+                  id="dialog-new-pw"
+                  type={showAdminPw ? "text" : "password"}
+                  placeholder="أدخل كلمة المرور الجديدة (6 أحرف على الأقل)"
+                  value={adminNewPw}
+                  onChange={(e) => setAdminNewPw(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAdminPw(!showAdminPw)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  tabIndex={-1}
+                >
+                  {showAdminPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dialog-confirm-pw">تأكيد كلمة المرور</Label>
+              <div className="relative">
+                <Input
+                  id="dialog-confirm-pw"
+                  type={showAdminConfirmPw ? "text" : "password"}
+                  placeholder="أعد إدخال كلمة المرور الجديدة"
+                  value={adminConfirmPw}
+                  onChange={(e) => setAdminConfirmPw(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAdminConfirmPw(!showAdminConfirmPw)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  tabIndex={-1}
+                >
+                  {showAdminConfirmPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {adminConfirmPw && adminNewPw !== adminConfirmPw && (
+                <p className="text-sm text-red-500">كلمات المرور غير متطابقة</p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={() => {
+                if (!passwordChangeUserId) return;
+                if (!adminNewPw || !adminConfirmPw) {
+                  toast.error("يرجى ملء جميع الحقول");
+                  return;
+                }
+                if (adminNewPw !== adminConfirmPw) {
+                  toast.error("كلمات المرور غير متطابقة");
+                  return;
+                }
+                if (adminNewPw.length < 6) {
+                  toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+                  return;
+                }
+                adminChangePasswordMutation.mutate({
+                  userId: passwordChangeUserId,
+                  newPassword: adminNewPw,
+                  sendEmail: false,
+                });
+              }}
+              disabled={adminChangePasswordMutation.isPending || !adminNewPw || !adminConfirmPw}
+            >
+              {adminChangePasswordMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  جاري التحديث...
+                </>
+              ) : (
+                "تحديث كلمة المرور"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

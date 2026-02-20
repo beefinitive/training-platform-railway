@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, email, name, roleId, employeeId, status FROM users WHERE email LIKE '%mohd%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, email, name, roleId, employeeId, status FROM users WHERE email LIKE '%mohd%';",
+  "rows": [
+    {
+      "id": "2130045",
+      "email": "Mohd.yes.no@gmail.com",
+      "name": "mohd.yes.no@gmail.com",
+      "roleId": "4",
+      "employeeId": "90002",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\troleId\temployeeId\tstatus\n2130045\tMohd.yes.no@gmail.com\tmohd.yes.no@gmail.com\t4\t90002\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1500
+}

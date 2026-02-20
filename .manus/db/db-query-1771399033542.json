@@ -1,0 +1,16 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'course_display_settings' AND COLUMN_NAME IN ('publicPrice', 'publicDiscountPrice');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'course_display_settings' AND COLUMN_NAME IN ('publicPrice', 'publicDiscountPrice');",
+  "rows": [
+    {
+      "COLUMN_NAME": "publicPrice"
+    },
+    {
+      "COLUMN_NAME": "publicDiscountPrice"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\npublicPrice\npublicDiscountPrice\n",
+  "stderr": "",
+  "execution_time_ms": 1515
+}

@@ -1,0 +1,74 @@
+{
+  "query": "SELECT id, type, customName, baseline, targetValue, year FROM strategicTargets WHERE year = 2026 ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, type, customName, baseline, targetValue, year FROM strategicTargets WHERE year = 2026 ORDER BY id;",
+  "rows": [
+    {
+      "id": "4",
+      "type": "direct_courses",
+      "customName": "الدورات المباشرة الجديدة",
+      "baseline": "4.00",
+      "targetValue": "4.00",
+      "year": "2026"
+    },
+    {
+      "id": "5",
+      "type": "recorded_courses",
+      "customName": "الدورات المسجلة الجديدة",
+      "baseline": "0.00",
+      "targetValue": "2.00",
+      "year": "2026"
+    },
+    {
+      "id": "6",
+      "type": "customers",
+      "customName": "زيادة أعداد العملاء الجدد",
+      "baseline": "0.00",
+      "targetValue": "600.00",
+      "year": "2026"
+    },
+    {
+      "id": "7",
+      "type": "annual_profit",
+      "customName": "زيادة الربح السنوي",
+      "baseline": "0.00",
+      "targetValue": "60000.00",
+      "year": "2026"
+    },
+    {
+      "id": "8",
+      "type": "entity_partnerships",
+      "customName": "شراكات الجهات",
+      "baseline": "0.00",
+      "targetValue": "2.00",
+      "year": "2026"
+    },
+    {
+      "id": "9",
+      "type": "innovative_ideas",
+      "customName": "فكرة نوعية",
+      "baseline": "0.00",
+      "targetValue": "12.00",
+      "year": "2026"
+    },
+    {
+      "id": "10",
+      "type": "customer_satisfaction",
+      "customName": "نسبة رضا العملاء ",
+      "baseline": "0.00",
+      "targetValue": "95.00",
+      "year": "2026"
+    },
+    {
+      "id": "11",
+      "type": "website_quality",
+      "customName": "جودة الموقع ",
+      "baseline": "0.00",
+      "targetValue": "100.00",
+      "year": "2026"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttype\tcustomName\tbaseline\ttargetValue\tyear\n4\tdirect_courses\tالدورات المباشرة الجديدة\t4.00\t4.00\t2026\n5\trecorded_courses\tالدورات المسجلة الجديدة\t0.00\t2.00\t2026\n6\tcustomers\tزيادة أعداد العملاء الجدد\t0.00\t600.00\t2026\n7\tannual_profit\tزيادة الربح السنوي\t0.00\t60000.00\t2026\n8\tentity_partnerships\tشراكات الجهات\t0.00\t2.00\t2026\n9\tinnovative_ideas\tفكرة نوعية\t0.00\t12.00\t2026\n10\tcustomer_satisfaction\tنسبة رضا العملاء \t0.00\t95.00\t2026\n11\twebsite_quality\tجودة الموقع \t0.00\t100.00\t2026\n",
+  "stderr": "",
+  "execution_time_ms": 2048
+}

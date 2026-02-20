@@ -38,33 +38,6 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
-  // TEMPORARY: Create admin user endpoint
-  app.post('/api/temp-create-admin', async (req, res) => {
-    try {
-      const bcrypt = await import('bcryptjs');
-      const { db } = await import('../db');
-      const schema = await import('../../drizzle/schema');
-      const { users } = schema;
-      
-      const password = 'Admin@123456';
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      await db.insert(users).values({
-        openId: 'admin_001',
-        name: 'مدير النظام',
-        email: 'admin@training-platform.com',
-        password: hashedPassword,
-        loginMethod: 'password',
-        roleId: 1,
-        status: 'active',
-      });
-      
-      res.json({ success: true, message: 'Admin user created successfully' });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-  
   // File upload API
   const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
   app.post('/api/upload', upload.single('file'), async (req, res) => {
@@ -82,6 +55,103 @@ async function startServer() {
       res.status(500).json({ error: error.message || 'حدث خطأ في رفع الملف' });
     }
   });
+  // Tap Payment Webhook
+  app.post('/api/webhooks/tap', async (req, res) => {
+    try {
+      const { id, status, reference, metadata } = req.body;
+      console.log('[Tap Webhook]', { id, status, reference });
+      if (status === 'CAPTURED') {
+        const dbModule = await import('../db');
+        // Update payment status
+        const payment = await dbModule.getPaymentByExternalId(id);
+        if (payment && payment.paymentStatus !== 'completed') {
+          await dbModule.updatePaymentStatus(payment.id, 'completed', id);
+          // Create enrollment
+          if (payment.recordedCourseId && payment.userId) {
+            const existingEnrollment = await dbModule.getEnrollmentByUserAndCourse(payment.userId, payment.recordedCourseId);
+            if (!existingEnrollment) {
+              await dbModule.createRecordedEnrollment({
+                courseId: payment.recordedCourseId,
+                userId: payment.userId,
+                fullName: 'User',
+                email: 'user@example.com',
+                paidAmount: payment.amount,
+                paymentStatus: 'paid',
+                paymentMethod: 'tap',
+              });
+            }
+            // Create instructor earning
+            const course = await dbModule.getRecordedCourseById(payment.recordedCourseId);
+            if (course) {
+              const amount = parseFloat(payment.amount);
+              const platformFee = amount * 0.15;
+              const instructorAmount = amount - platformFee;
+              await dbModule.createInstructorEarning({
+                instructorId: course.instructorId,
+                courseId: payment.recordedCourseId,
+                enrollmentId: 0,
+                totalAmount: amount.toString(),
+                platformCommission: platformFee.toString(),
+                instructorAmount: instructorAmount.toString(),
+              });
+            }
+          }
+        }
+      }
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('[Tap Webhook Error]', error);
+      res.status(200).json({ received: true });
+    }
+  });
+
+  // Tabby Payment Webhook
+  app.post('/api/webhooks/tabby', async (req, res) => {
+    try {
+      const { id, status, order } = req.body;
+      console.log('[Tabby Webhook]', { id, status });
+      if (status === 'AUTHORIZED' || status === 'CLOSED') {
+        const dbModule = await import('../db');
+        const payment = await dbModule.getPaymentByExternalId(id);
+        if (payment && payment.paymentStatus !== 'completed') {
+          await dbModule.updatePaymentStatus(payment.id, 'completed', id);
+          if (payment.recordedCourseId && payment.userId) {
+            const existingEnrollment = await dbModule.getEnrollmentByUserAndCourse(payment.userId, payment.recordedCourseId);
+            if (!existingEnrollment) {
+              await dbModule.createRecordedEnrollment({
+                courseId: payment.recordedCourseId,
+                userId: payment.userId,
+                fullName: 'User',
+                email: 'user@example.com',
+                paidAmount: payment.amount,
+                paymentStatus: 'paid',
+                paymentMethod: 'tabby',
+              });
+            }
+            const course = await dbModule.getRecordedCourseById(payment.recordedCourseId);
+            if (course) {
+              const amount = parseFloat(payment.amount);
+              const platformFee = amount * 0.15;
+              const instructorAmount = amount - platformFee;
+              await dbModule.createInstructorEarning({
+                instructorId: course.instructorId,
+                courseId: payment.recordedCourseId,
+                enrollmentId: 0,
+                totalAmount: amount.toString(),
+                platformCommission: platformFee.toString(),
+                instructorAmount: instructorAmount.toString(),
+              });
+            }
+          }
+        }
+      }
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('[Tabby Webhook Error]', error);
+      res.status(200).json({ received: true });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

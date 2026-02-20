@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, openId, email, name FROM users ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, openId, email, name FROM users ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "720166",
+      "openId": "pwd_720166",
+      "email": "mahaccount@gmail.com",
+      "name": "محمود"
+    },
+    {
+      "id": "720103",
+      "openId": "NULL",
+      "email": "rannno@gmail.com",
+      "name": "رنا "
+    },
+    {
+      "id": "660042",
+      "openId": "NULL",
+      "email": "mohd.yes.no@gmail.com",
+      "name": "Mohamed Ibrahim Youssef"
+    },
+    {
+      "id": "660031",
+      "openId": "NULL",
+      "email": "shaima@gamil.ocm",
+      "name": "شيماء"
+    },
+    {
+      "id": "540352",
+      "openId": "NULL",
+      "email": "test-role-1767942247048@example.com",
+      "name": "Test Employee with Role"
+    },
+    {
+      "id": "540351",
+      "openId": "NULL",
+      "email": "layla-1767942244309@example.com",
+      "name": "ليلى محمد"
+    },
+    {
+      "id": "540349",
+      "openId": "NULL",
+      "email": "ali-1767942243305@example.com",
+      "name": "علي أحمد"
+    },
+    {
+      "id": "540348",
+      "openId": "NULL",
+      "email": "salem-1767942241419@example.com",
+      "name": "محمد سالم"
+    },
+    {
+      "id": "540347",
+      "openId": "NULL",
+      "email": "fatima-1767942239985@example.com",
+      "name": "فاطمة محمد"
+    },
+    {
+      "id": "540346",
+      "openId": "NULL",
+      "email": "ahmed-1767942238973@example.com",
+      "name": "أحمد علي"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\temail\tname\n720166\tpwd_720166\tmahaccount@gmail.com\tمحمود\n720103\tNULL\trannno@gmail.com\tرنا \n660042\tNULL\tmohd.yes.no@gmail.com\tMohamed Ibrahim Youssef\n660031\tNULL\tshaima@gamil.ocm\tشيماء\n540352\tNULL\ttest-role-1767942247048@example.com\tTest Employee with Role\n540351\tNULL\tlayla-1767942244309@example.com\tليلى محمد\n540349\tNULL\tali-1767942243305@example.com\tعلي أحمد\n540348\tNULL\tsalem-1767942241419@example.com\tمحمد سالم\n540347\tNULL\tfatima-1767942239985@example.com\tفاطمة محمد\n540346\tNULL\tahmed-1767942238973@example.com\tأحمد علي\n",
+  "stderr": "",
+  "execution_time_ms": 1528
+}

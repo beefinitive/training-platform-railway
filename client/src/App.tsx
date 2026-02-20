@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
+import { PermissionRoute } from "./components/PermissionRoute";
 import { CustomerServiceRoute } from "./components/CustomerServiceRoute";
 import Home from "./pages/Home";
 import CoursesHub from "./pages/CoursesHub";
@@ -21,6 +22,11 @@ import Partnerships from "./pages/Partnerships";
 import InnovativeIdeas from "./pages/InnovativeIdeas";
 
 import Login from "./pages/Login";
+import Landing from "./pages/public/Landing";
+import PublicCourses from "./pages/public/Courses";
+import PublicCourseDetail from "./pages/public/CourseDetail";
+import PublicServices from "./pages/public/Services";
+import PublicContact from "./pages/public/Contact";
 import PermissionsManagement from "./pages/PermissionsManagement";
 import PasswordManagement from "./pages/PasswordManagement";
 import BulkDeleteUsers from "./pages/BulkDeleteUsers";
@@ -37,12 +43,31 @@ import DailyReports from "./pages/DailyReports";
 import Salaries from "./pages/Salaries";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
+import RecordedCourses from "./pages/RecordedCourses";
+import RecordedCourseView from "./pages/RecordedCourseView";
+import InstructorDashboard from "./pages/InstructorDashboard";
+import PublicRecordedCourses from "./pages/public/RecordedCourses";
+import PublicRecordedCourseDetail from "./pages/public/RecordedCourseDetail";
+import PaymentCallback from "./pages/PaymentCallback";
+import MyCertificates from "./pages/MyCertificates";
+import MyPayments from "./pages/MyPayments";
 import MyTargets from "./pages/MyTargets";
 import DailyStatsReview from "./pages/DailyStatsReview";
+import ApprovedStatsReport from "./pages/ApprovedStatsReport";
+import TargetAlerts from "./pages/TargetAlerts";
 
 function Router() {
   return (
     <Switch>
+      {/* الصفحات العامة - الموقع الإلكتروني */}
+      <Route path="/public" component={Landing} />
+      <Route path="/public/courses" component={PublicCourses} />
+      <Route path="/public/courses/:id" component={PublicCourseDetail} />
+      <Route path="/public/services" component={PublicServices} />
+      <Route path="/public/recorded-courses" component={PublicRecordedCourses} />
+      <Route path="/public/recorded-courses/:slug" component={PublicRecordedCourseDetail} />
+      <Route path="/public/contact" component={PublicContact} />
+      
       {/* صفحة تسجيل الدخول - عامة */}
       <Route path="/login" component={Login} />
       
@@ -50,6 +75,12 @@ function Router() {
       <Route path="/" component={() => <CustomerServiceRoute><Home /></CustomerServiceRoute>} />
       <Route path="/courses" component={() => <ProtectedRoute><CoursesHub /></ProtectedRoute>} />
       <Route path="/courses/:id" component={() => <ProtectedRoute><CourseDetails /></ProtectedRoute>} />
+      <Route path="/recorded-courses" component={() => <ProtectedRoute><RecordedCourses /></ProtectedRoute>} />
+      <Route path="/recorded-courses/view/:id" component={() => <ProtectedRoute><RecordedCourseView /></ProtectedRoute>} />
+      <Route path="/instructor-dashboard" component={() => <ProtectedRoute><InstructorDashboard /></ProtectedRoute>} />
+      <Route path="/my-certificates" component={() => <ProtectedRoute><MyCertificates /></ProtectedRoute>} />
+      <Route path="/my-payments" component={() => <ProtectedRoute><MyPayments /></ProtectedRoute>} />
+      <Route path="/payment/callback" component={PaymentCallback} />
       <Route path="/reports" component={() => <ProtectedRoute><Reports /></ProtectedRoute>} />
       
       <Route path="/archive" component={() => <ProtectedRoute><Archive /></ProtectedRoute>} />
@@ -75,12 +106,14 @@ function Router() {
       <Route path="/user-management" component={() => <AdminRoute><UserManagement /></AdminRoute>} />
       <Route path="/employees" component={() => <AdminRoute><Employees /></AdminRoute>} />
       <Route path="/employee-management" component={() => <AdminRoute><EmployeeManagement /></AdminRoute>} />
-      <Route path="/employee-targets" component={() => <AdminRoute><EmployeeTargets /></AdminRoute>} />
+      <Route path="/employee-targets" component={() => <PermissionRoute permission="employee_targets.view"><EmployeeTargets /></PermissionRoute>} />
       <Route path="/attendance" component={() => <AdminRoute><Attendance /></AdminRoute>} />
       <Route path="/daily-reports" component={() => <AdminRoute><DailyReports /></AdminRoute>} />
       <Route path="/salaries" component={() => <AdminRoute><Salaries /></AdminRoute>} />
       <Route path="/employees/:id" component={() => <AdminRoute><EmployeeProfile /></AdminRoute>} />
-      <Route path="/daily-stats-review" component={() => <AdminRoute><DailyStatsReview /></AdminRoute>} />
+      <Route path="/daily-stats-review" component={() => <PermissionRoute permission="employee_stats.review"><DailyStatsReview /></PermissionRoute>} />
+      <Route path="/approved-stats-report" component={() => <PermissionRoute permission="employee_performance.view"><ApprovedStatsReport /></PermissionRoute>} />
+      <Route path="/target-alerts" component={() => <PermissionRoute permission="employee_targets.view"><TargetAlerts /></PermissionRoute>} />
       
       {/* صفحات الخطأ */}
       <Route path="/404" component={NotFound} />

@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, email, name, loginMethod FROM users ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, email, name, loginMethod FROM users ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "720103",
+      "email": "rannno@gmail.com",
+      "name": "رنا ",
+      "loginMethod": "password"
+    },
+    {
+      "id": "660042",
+      "email": "mohd.yes.no@gmail.com",
+      "name": "Mohamed Ibrahim Youssef",
+      "loginMethod": "google"
+    },
+    {
+      "id": "660031",
+      "email": "shaima@gamil.ocm",
+      "name": "شيماء",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540352",
+      "email": "test-role-1767942247048@example.com",
+      "name": "Test Employee with Role",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540351",
+      "email": "layla-1767942244309@example.com",
+      "name": "ليلى محمد",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540349",
+      "email": "ali-1767942243305@example.com",
+      "name": "علي أحمد",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540348",
+      "email": "salem-1767942241419@example.com",
+      "name": "محمد سالم",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540347",
+      "email": "fatima-1767942239985@example.com",
+      "name": "فاطمة محمد",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540346",
+      "email": "ahmed-1767942238973@example.com",
+      "name": "أحمد علي",
+      "loginMethod": "password"
+    },
+    {
+      "id": "540275",
+      "email": "layla-1767941465016@example.com",
+      "name": "ليلى محمد",
+      "loginMethod": "password"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\n720103\trannno@gmail.com\tرنا \tpassword\n660042\tmohd.yes.no@gmail.com\tMohamed Ibrahim Youssef\tgoogle\n660031\tshaima@gamil.ocm\tشيماء\tpassword\n540352\ttest-role-1767942247048@example.com\tTest Employee with Role\tpassword\n540351\tlayla-1767942244309@example.com\tليلى محمد\tpassword\n540349\tali-1767942243305@example.com\tعلي أحمد\tpassword\n540348\tsalem-1767942241419@example.com\tمحمد سالم\tpassword\n540347\tfatima-1767942239985@example.com\tفاطمة محمد\tpassword\n540346\tahmed-1767942238973@example.com\tأحمد علي\tpassword\n540275\tlayla-1767941465016@example.com\tليلى محمد\tpassword\n",
+  "stderr": "",
+  "execution_time_ms": 1629
+}

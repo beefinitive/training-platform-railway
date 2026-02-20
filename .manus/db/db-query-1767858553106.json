@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, courseCode, name, instructorName, status FROM courses ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, courseCode, name, instructorName, status FROM courses ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "60002",
+      "courseCode": "C-03-12-2025",
+      "name": "Test Course",
+      "instructorName": "Test Instructor",
+      "status": "active"
+    },
+    {
+      "id": "60001",
+      "courseCode": "C-02-11-2025",
+      "name": "تدريب المدربين",
+      "instructorName": "خالد آل عزيز",
+      "status": "completed"
+    },
+    {
+      "id": "11",
+      "courseCode": "C-01-11-2025",
+      "name": "التصوير بالجوال",
+      "instructorName": "خالد البارقي",
+      "status": "completed"
+    },
+    {
+      "id": "8",
+      "courseCode": "C-07-12-2025",
+      "name": "تدريب المدربين",
+      "instructorName": "خالد آل عزيز",
+      "status": "completed"
+    },
+    {
+      "id": "2",
+      "courseCode": "NULL",
+      "name": "تدريب المدربين - يناير ",
+      "instructorName": "محسن آل عزيز",
+      "status": "active"
+    },
+    {
+      "id": "1",
+      "courseCode": "NULL",
+      "name": "التصوير بالجوال ",
+      "instructorName": "خالد البارقي",
+      "status": "completed"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcourseCode\tname\tinstructorName\tstatus\n60002\tC-03-12-2025\tTest Course\tTest Instructor\tactive\n60001\tC-02-11-2025\tتدريب المدربين\tخالد آل عزيز\tcompleted\n11\tC-01-11-2025\tالتصوير بالجوال\tخالد البارقي\tcompleted\n8\tC-07-12-2025\tتدريب المدربين\tخالد آل عزيز\tcompleted\n2\tNULL\tتدريب المدربين - يناير \tمحسن آل عزيز\tactive\n1\tNULL\tالتصوير بالجوال \tخالد البارقي\tcompleted\n",
+  "stderr": "",
+  "execution_time_ms": 1497
+}

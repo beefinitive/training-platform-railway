@@ -1,4 +1,4 @@
-import { eq, desc, sql, and, gte, lte, ne, inArray } from "drizzle-orm";
+import { eq, desc, sql, and, gte, lte, ne, inArray, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -32,17 +32,36 @@ import {
   salaryAdjustments, InsertSalaryAdjustment,
   passwordHistory, InsertPasswordHistory,
   dailyStats, InsertDailyStat,
-  projectEmployees, InsertProjectEmployee
+  projectEmployees, InsertProjectEmployee,
+  publicRegistrations, InsertPublicRegistration,
+  publicServices, InsertPublicService,
+  serviceOrders, InsertServiceOrder,
+  courseDisplaySettings, InsertCourseDisplaySetting,
+  recordedCourses, InsertRecordedCourse,
+  recordedCourseSections, InsertRecordedCourseSection,
+  recordedCourseLessons, InsertRecordedCourseLesson,
+  recordedCourseEnrollments, InsertRecordedCourseEnrollment,
+  lessonProgress, InsertLessonProgress,
+  recordedCourseReviews, InsertRecordedCourseReview,
+  instructorEarnings, InsertInstructorEarning,
+  courseViewLogs, InsertCourseViewLog,
+  payments, InsertPayment,
+  courseReviews, InsertCourseReview,
+  certificates, InsertCertificate,
+  quizzes, InsertQuiz,
+  quizQuestions, InsertQuizQuestion,
+  quizAnswers, InsertQuizAnswer,
+  quizAttempts, InsertQuizAttempt,
+  targetAlerts, InsertTargetAlert
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
 export async function getDb() {
-  const connectionString = process.env.DATABASE_URL || process.env.MYSQL_URL;
-  if (!_db && connectionString) {
+  if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(connectionString);
+      _db = drizzle(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -192,7 +211,50 @@ export async function updateCourse(id: number, course: Record<string, unknown>) 
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Get the old course data to check if dates changed
+  const oldCourse = await db.select().from(courses).where(eq(courses.id, id)).limit(1);
+  if (!oldCourse[0]) throw new Error("Course not found");
+  
+  const oldStartDate = oldCourse[0].startDate;
+  const newStartDate = course.startDate ? new Date(course.startDate as string) : null;
+  
+  // Calculate date difference before updating the course
+  let dateDiff = 0;
+  if (newStartDate && oldStartDate) {
+    const oldDate = new Date(oldStartDate);
+    // Normalize both dates to midnight UTC for accurate comparison
+    const oldDateNormalized = new Date(Date.UTC(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate()));
+    const newDateNormalized = new Date(Date.UTC(newStartDate.getFullYear(), newStartDate.getMonth(), newStartDate.getDate()));
+    dateDiff = newDateNormalized.getTime() - oldDateNormalized.getTime();
+  }
+  
+  // Update the course
   await db.update(courses).set(course).where(eq(courses.id, id));
+  
+  // If start date changed, update all related data dates
+  if (dateDiff !== 0 && newStartDate) {
+    // Update enrollment dates
+    const enrollments = await db.select().from(courseEnrollments).where(eq(courseEnrollments.courseId, id));
+    for (const enrollment of enrollments) {
+      const oldEnrollmentDate = new Date(enrollment.enrollmentDate);
+      const newEnrollmentDate = new Date(oldEnrollmentDate.getTime() + dateDiff);
+      await db.update(courseEnrollments)
+        .set({ enrollmentDate: newEnrollmentDate })
+        .where(eq(courseEnrollments.id, enrollment.id));
+    }
+    
+    // Update expense dates
+    const expenses = await db.select().from(courseExpenses).where(eq(courseExpenses.courseId, id));
+    for (const expense of expenses) {
+      const oldExpenseDate = new Date(expense.expenseDate);
+      const newExpenseDate = new Date(oldExpenseDate.getTime() + dateDiff);
+      await db.update(courseExpenses)
+        .set({ expenseDate: newExpenseDate })
+        .where(eq(courseExpenses.id, expense.id));
+    }
+    
+    console.log(`[updateCourse] Updated dates for course ${id}: moved ${enrollments.length} enrollments and ${expenses.length} expenses by ${dateDiff / (1000 * 60 * 60 * 24)} days`);
+  }
 }
 
 export async function deleteCourse(id: number, keepStatistics: boolean = true) {
@@ -1340,8 +1402,20 @@ export async function getStrategicTargetActuals(year: number) {
   const startDate = `${year}-01-01`;
   const endDate = `${year}-12-31`;
   
-  // Count direct courses (total number of courses held)
-  const directCourses = await db
+  // Count direct courses (NEW course templates created this year - not repeated courses)
+  // This counts unique/new course templates, not the courses that are created from them
+  const directCourseTemplates = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(courseTemplates)
+    .where(
+      and(
+        eq(courseTemplates.isActive, true),
+        sql`YEAR(${courseTemplates.createdAt}) = ${year}`
+      )
+    );
+  
+  // Count total courses held (from courses table - for reference)
+  const totalCoursesHeld = await db
     .select({ count: sql<number>`count(*)` })
     .from(courses)
     .where(
@@ -1349,17 +1423,6 @@ export async function getStrategicTargetActuals(year: number) {
         ne(courses.status, "cancelled"),
         sql`${courses.startDate} >= ${startDate}`,
         sql`${courses.startDate} <= ${endDate}`
-      )
-    );
-  
-  // Count new/unique courses (based on unique templates created in this year)
-  const newCourseTemplates = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(courseTemplates)
-    .where(
-      and(
-        eq(courseTemplates.isActive, true),
-        sql`YEAR(${courseTemplates.createdAt}) = ${year}`
       )
     );
   
@@ -1462,8 +1525,8 @@ export async function getStrategicTargetActuals(year: number) {
       )
     );
     return {
-    direct_courses: directCourses[0]?.count || 0,
-    new_courses: newCourseTemplates[0]?.count || 0, // Unique courses based on templates
+    direct_courses: directCourseTemplates[0]?.count || 0, // NEW course templates (not repeated courses)
+    new_courses: directCourseTemplates[0]?.count || 0, // Same as direct_courses - unique templates
     recorded_courses: 0, // Will be implemented when course type is added,
     customers: parseInt(enrollmentData[0]?.total?.toString() || "0"),
     annual_profit: annualProfit,
@@ -2551,8 +2614,19 @@ export async function getEmployeeById(id: number) {
 export async function getEmployeeByUserId(userId: number) {
   const db = await getDb();
   if (!db) return null;
+  // أولاً: البحث عن الموظف عبر employees.userId
   const result = await db.select().from(employees).where(eq(employees.userId, userId));
-  return result[0] || null;
+  if (result[0]) return result[0];
+  
+  // ثانياً: البحث عبر users.employeeId (في حالة الربط من جهة المستخدم فقط)
+  const userResult = await db.select().from(users).where(eq(users.id, userId));
+  const user = userResult[0];
+  if (user?.employeeId) {
+    const empResult = await db.select().from(employees).where(eq(employees.id, user.employeeId));
+    return empResult[0] || null;
+  }
+  
+  return null;
 }
 
 export async function createEmployee(employee: Omit<InsertEmployee, 'id' | 'createdAt' | 'updatedAt'>) {
@@ -2667,10 +2741,78 @@ export async function listEmployeeTargets(employeeId?: number, year?: number, mo
   const db = await getDb();
   if (!db) return [];
   
+  // إذا تم تحديد موظف وشهر وسنة، نستخدم الدالة المحدثة التي تحسب المتحقق تلقائياً
+  if (employeeId && month && year) {
+    return getEmployeeTargetsWithProgress(employeeId, month, year);
+  }
+  
+  // إذا تم تحديد شهر وسنة بدون موظف محدد، نحسب المتحقق لجميع الموظفين
+  if (month && year) {
+    const conditions = [
+      eq(employeeTargets.year, year),
+      eq(employeeTargets.month, month)
+    ];
+    
+    const targets = await db.select().from(employeeTargets)
+      .where(and(...conditions))
+      .orderBy(desc(employeeTargets.createdAt));
+    
+    // حساب المتحقق لكل مستهدف
+    const uniqueEmployeeIds = Array.from(new Set(targets.map(t => t.employeeId)));
+    const totalsMap: Record<number, any> = {};
+    
+    for (const empId of uniqueEmployeeIds) {
+      totalsMap[empId] = await getDailyStatsMonthlyTotal(empId, month, year);
+    }
+    
+    const targetTypeMapping: Record<string, string> = {
+      'confirmed_customers': 'confirmedCustomers',
+      'registered_customers': 'registeredCustomers',
+      'targeted_customers': 'targetedCustomers',
+      'services_sold': 'servicesSold',
+      'sales_amount': 'totalRevenue',
+      'daily_calls': 'targetedCustomers',
+    };
+    
+    return targets.map(target => {
+      const totals = totalsMap[target.employeeId] || {};
+      const statsField = targetTypeMapping[target.targetType];
+      let achieved = 0;
+      
+      if (statsField && statsField in totals) {
+        achieved = Number(totals[statsField]) || 0;
+      }
+      
+      const baseValue = parseFloat(target.baseValue || '0') || 0;
+      const totalAchieved = baseValue + achieved;
+      const targetValue = parseFloat(target.targetValue as string) || 0;
+      const remaining = Math.max(0, targetValue - totalAchieved);
+      const percentage = targetValue > 0 ? Math.min((totalAchieved / targetValue) * 100, 100) : 0;
+      
+      let newStatus = target.status;
+      if (totalAchieved >= targetValue && targetValue > 0) {
+        newStatus = 'achieved';
+      } else if (totalAchieved < targetValue && target.status === 'achieved') {
+        newStatus = 'in_progress';
+      }
+      
+      return {
+        ...target,
+        currentValue: String(totalAchieved),
+        achieved: totalAchieved,
+        dailyStatsAchieved: achieved,
+        baseValue: String(baseValue),
+        remaining,
+        percentage,
+        status: newStatus,
+      };
+    });
+  }
+  
+  // الحالة الافتراضية - بدون حساب المتحقق
   const conditions = [];
   if (employeeId) conditions.push(eq(employeeTargets.employeeId, employeeId));
   if (year) conditions.push(eq(employeeTargets.year, year));
-  if (month) conditions.push(eq(employeeTargets.month, month));
   
   if (conditions.length > 0) {
     return db.select().from(employeeTargets)
@@ -3426,7 +3568,7 @@ export async function updateEmployeeProfile(employeeId: number, data: {
   await db.update(employees).set(data).where(eq(employees.id, employeeId));
 }
 
-// Get employee targets with progress
+// Get employee targets with progress - يحسب المتحقق تلقائياً من الإحصائيات اليومية المعتمدة
 export async function getEmployeeTargetsWithProgress(employeeId: number, month?: number, year?: number) {
   const db = await getDb();
   if (!db) return [];
@@ -3435,53 +3577,89 @@ export async function getEmployeeTargetsWithProgress(employeeId: number, month?:
   const currentMonth = month || now.getMonth() + 1;
   const currentYear = year || now.getFullYear();
   
-  const targets = await db.select().from(employeeTargets)
-    .where(eq(employeeTargets.employeeId, employeeId));
+  // أولاً: حساب المجاميع من الإحصائيات اليومية المعتمدة (daily_stats)
+  const totals = await getDailyStatsMonthlyTotal(employeeId, currentMonth, currentYear);
   
-  // For each target, calculate achievement
+  // خريطة ربط أنواع المستهدفات بحقول الإحصائيات
+  const targetTypeMapping: Record<string, keyof typeof totals> = {
+    'confirmed_customers': 'confirmedCustomers',
+    'registered_customers': 'registeredCustomers',
+    'targeted_customers': 'targetedCustomers',
+    'services_sold': 'servicesSold',
+    'sales_amount': 'totalRevenue',
+    'daily_calls': 'targetedCustomers',
+  };
+  
+  // جلب المستهدفات للشهر والسنة المحددين
+  const conditions = [
+    eq(employeeTargets.employeeId, employeeId),
+    eq(employeeTargets.month, currentMonth),
+    eq(employeeTargets.year, currentYear)
+  ];
+  
+  const targets = await db.select().from(employeeTargets)
+    .where(and(...conditions));
+  
+  // حساب التقدم لكل مستهدف وتحديث currentValue تلقائياً
   const targetsWithProgress = await Promise.all(targets.map(async (target) => {
+    const statsField = targetTypeMapping[target.targetType];
     let achieved = 0;
     
-    // Get achievement based on target type
-    if (target.targetType === 'daily_calls') {
-      const reports = await db.select().from(dailyReports)
-        .where(and(
-          eq(dailyReports.employeeId, employeeId),
-          eq(sql`MONTH(${dailyReports.reportDate})`, currentMonth),
-          eq(sql`YEAR(${dailyReports.reportDate})`, currentYear)
-        ));
-      
-      achieved = reports.reduce((sum, r) => sum + r.targetedCustomers, 0);
-    } else if (target.targetType === 'confirmed_customers') {
-      const reports = await db.select().from(dailyReports)
-        .where(and(
-          eq(dailyReports.employeeId, employeeId),
-          eq(sql`MONTH(${dailyReports.reportDate})`, currentMonth),
-          eq(sql`YEAR(${dailyReports.reportDate})`, currentYear)
-        ));
-      
-      achieved = reports.reduce((sum, r) => sum + r.confirmedCustomers, 0);
-    } else if (target.targetType === 'registered_customers') {
-      const reports = await db.select().from(dailyReports)
-        .where(and(
-          eq(dailyReports.employeeId, employeeId),
-          eq(sql`MONTH(${dailyReports.reportDate})`, currentMonth),
-          eq(sql`YEAR(${dailyReports.reportDate})`, currentYear)
-        ));
-      
-      achieved = reports.reduce((sum, r) => sum + r.registeredCustomers, 0);
+    if (statsField && statsField in totals) {
+      achieved = Number(totals[statsField as keyof typeof totals]) || 0;
     }
     
-    const targetValue = parseInt(target.targetValue as string) || 0;
-    const percentage = targetValue > 0 ? (achieved / targetValue) * 100 : 0;
+    // إضافة القيمة الأساسية (baseValue) للمتحقق
+    const baseValue = parseFloat(target.baseValue || '0') || 0;
+    const totalAchieved = baseValue + achieved;
+    
+    const targetValue = parseFloat(target.targetValue as string) || 0;
+    const remaining = Math.max(0, targetValue - totalAchieved);
+    const percentage = targetValue > 0 ? (totalAchieved / targetValue) * 100 : 0;
+    
+    // تحديث currentValue و status تلقائياً في قاعدة البيانات
+    let newStatus = target.status;
+    if (totalAchieved >= targetValue && targetValue > 0) {
+      newStatus = 'achieved';
+    } else if (totalAchieved < targetValue && target.status === 'achieved') {
+      newStatus = 'in_progress';
+    }
+    
+    // تحديث القيمة الحالية في قاعدة البيانات إذا تغيرت
+    if (String(totalAchieved) !== target.currentValue || newStatus !== target.status) {
+      await db.update(employeeTargets)
+        .set({ 
+          currentValue: String(totalAchieved),
+          status: newStatus
+        })
+        .where(eq(employeeTargets.id, target.id));
+    }
     
     return {
       ...target,
-      achieved,
-      percentage: Math.min(percentage, 100)
+      currentValue: String(totalAchieved),
+      achieved: totalAchieved,
+      dailyStatsAchieved: achieved,
+      baseValue: String(baseValue),
+      remaining,
+      percentage: Math.min(percentage, 100),
+      status: newStatus,
     };
   }));
   
+  // فحص وإنشاء تنبيهات تلقائية عند 80% أو 100%
+  try {
+    const newAlerts = await checkAndCreateTargetAlerts(employeeId, targetsWithProgress);
+    if (newAlerts.length > 0) {
+      // إرسال إشعارات المالك للتنبيهات الجديدة
+      sendPendingAlertNotifications().catch(err => {
+        console.error('[TargetAlerts] Error sending notifications:', err);
+      });
+    }
+  } catch (err) {
+    console.error('[TargetAlerts] Error checking alerts:', err);
+  }
+
   return targetsWithProgress;
 }
 
@@ -4279,14 +4457,27 @@ export async function getDailyStatByDate(employeeId: number, date: string) {
 }
 
 // Create daily stat with course linking - always creates new record (allows multiple stats per day)
-export async function upsertDailyStat(data: InsertDailyStat & { courseId?: number; courseFee?: string }) {
+export async function upsertDailyStat(data: InsertDailyStat & { courseId?: number; courseFee?: string; feeBreakdown?: string; calculatedRevenue?: number; soldServices?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Calculate revenue if courseId and courseFee are provided
-  const calculatedRevenue = data.courseId && data.courseFee 
-    ? (parseFloat(data.courseFee) * (data.confirmedCustomers || 0)).toFixed(2)
-    : "0";
+  // Calculate revenue - either from feeBreakdown or from courseFee
+  let calculatedRevenue = "0";
+  
+  if (data.feeBreakdown) {
+    // حساب الإيراد من تفاصيل الأسعار المتعددة
+    try {
+      const breakdown = JSON.parse(data.feeBreakdown);
+      calculatedRevenue = breakdown.reduce((sum: number, item: { feeAmount: number; customerCount: number }) => 
+        sum + (item.feeAmount * (item.customerCount || 0)), 0
+      ).toFixed(2);
+    } catch (e) {
+      calculatedRevenue = "0";
+    }
+  } else if (data.courseId && data.courseFee) {
+    // حساب الإيراد بالطريقة القديمة
+    calculatedRevenue = (parseFloat(data.courseFee) * (data.confirmedCustomers || 0)).toFixed(2);
+  }
   
   // Always create new stat - allows multiple entries per day per employee
   const result = await db.insert(dailyStats).values({
@@ -4376,11 +4567,14 @@ export async function addDailyStatRevenueToCourse(courseId: number, dailyStatId:
 }
 
 // Create daily stat
-export async function createDailyStat(data: InsertDailyStat & { courseId?: number; courseFee?: string }) {
-  // Convert null to undefined for courseId
+export async function createDailyStat(data: InsertDailyStat & { courseId?: number; courseFee?: string; feeBreakdown?: string; calculatedRevenue?: number; soldServices?: string }) {
+  // Convert null to undefined for courseId, feeBreakdown, and soldServices
   const cleanData = {
     ...data,
     courseId: data.courseId ?? undefined,
+    feeBreakdown: data.feeBreakdown ?? undefined,
+    calculatedRevenue: data.calculatedRevenue ?? undefined,
+    soldServices: data.soldServices ?? undefined,
   };
   return upsertDailyStat(cleanData);
 }
@@ -4498,24 +4692,31 @@ export async function getDailyStatsMonthlyTotal(employeeId: number, month: numbe
     registeredCustomers: 0,
     targetedCustomers: 0,
     servicesSold: 0,
+    targetedByServices: 0,
     salesAmount: 0,
     totalDays: 0,
     totalRevenue: 0,
+    servicesRevenue: 0,
+    coursesRevenue: 0,
   };
 
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0);
 
+  // حساب الإحصائيات المؤكدة فقط (approved) - لا تُحتسب الإحصائيات المعلقة أو المرفوضة
   const result = await db.select({
-    confirmedCustomers: sql<number>`COALESCE(SUM(${dailyStats.confirmedCustomers}), 0)`,
-    registeredCustomers: sql<number>`COALESCE(SUM(${dailyStats.registeredCustomers}), 0)`,
-    targetedCustomers: sql<number>`COALESCE(SUM(${dailyStats.targetedCustomers}), 0)`,
-    servicesSold: sql<number>`COALESCE(SUM(${dailyStats.servicesSold}), 0)`,
-    salesAmount: sql<number>`COALESCE(SUM(${dailyStats.salesAmount}), 0)`,
-    // حساب أيام العمل الفريدة (بالتاريخ) بدلاً من عدد الإحصائيات
-    totalDays: sql<number>`COUNT(DISTINCT DATE(${dailyStats.date}))`,
-    // إجمالي الإيرادات المحصّلة من الإحصائيات المؤكدة
-    totalRevenue: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN CAST(${dailyStats.calculatedRevenue} AS DECIMAL(10,2)) ELSE 0 END), 0)`,
+    // حساب العملاء المؤكدين من الإحصائيات الموافق عليها فقط
+    confirmedCustomers: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN ${dailyStats.confirmedCustomers} ELSE 0 END), 0)`,
+    registeredCustomers: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN ${dailyStats.registeredCustomers} ELSE 0 END), 0)`,
+    targetedCustomers: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN ${dailyStats.targetedCustomers} ELSE 0 END), 0)`,
+    servicesSold: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN ${dailyStats.servicesSold} ELSE 0 END), 0)`,
+    targetedByServices: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN ${dailyStats.targetedByServices} ELSE 0 END), 0)`,
+    // إيرادات الخدمات المباعة (من حقل salesAmount)
+    salesAmount: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN ${dailyStats.salesAmount} ELSE 0 END), 0)`,
+    // حساب أيام العمل الفريدة (بالتاريخ) من الإحصائيات المؤكدة فقط
+    totalDays: sql<number>`COUNT(DISTINCT CASE WHEN ${dailyStats.status} = 'approved' THEN DATE(${dailyStats.date}) ELSE NULL END)`,
+    // إيرادات الدورات (من حقل calculatedRevenue)
+    coursesRevenue: sql<number>`COALESCE(SUM(CASE WHEN ${dailyStats.status} = 'approved' THEN CAST(${dailyStats.calculatedRevenue} AS DECIMAL(10,2)) ELSE 0 END), 0)`,
   }).from(dailyStats)
     .where(and(
       eq(dailyStats.employeeId, employeeId),
@@ -4523,14 +4724,29 @@ export async function getDailyStatsMonthlyTotal(employeeId: number, month: numbe
       lte(dailyStats.date, endDate)
     ));
 
-  return result[0] || {
+  const stats = result[0] || {
     confirmedCustomers: 0,
     registeredCustomers: 0,
     targetedCustomers: 0,
     servicesSold: 0,
+    targetedByServices: 0,
     salesAmount: 0,
     totalDays: 0,
-    totalRevenue: 0,
+    coursesRevenue: 0,
+  };
+
+  // إيرادات الخدمات = salesAmount (مبلغ الخدمات المباعة)
+  const servicesRevenue = Number(stats.salesAmount) || 0;
+  // إيرادات الدورات = calculatedRevenue
+  const coursesRevenue = Number(stats.coursesRevenue) || 0;
+  // إجمالي الإيرادات = إيرادات الدورات + إيرادات الخدمات
+  const totalRevenue = coursesRevenue + servicesRevenue;
+
+  return {
+    ...stats,
+    servicesRevenue,
+    coursesRevenue,
+    totalRevenue,
   };
 }
 
@@ -4662,6 +4878,7 @@ export async function listDailyStatsForReview(
     registeredCustomers: dailyStats.registeredCustomers,
     targetedCustomers: dailyStats.targetedCustomers,
     servicesSold: dailyStats.servicesSold,
+    targetedByServices: dailyStats.targetedByServices,
     salesAmount: dailyStats.salesAmount,
     notes: dailyStats.notes,
     status: dailyStats.status,
@@ -4709,6 +4926,27 @@ export async function approveDailyStat(id: number, reviewerId: number, reviewNot
         stat.calculatedRevenue
       );
     }
+    
+    // إضافة الخدمات المباعة إلى جدول الخدمات بعد موافقة المشرف
+    if (stat.soldServices) {
+      try {
+        const soldServicesData = JSON.parse(stat.soldServices);
+        for (const service of soldServicesData) {
+          if (service.templateId && service.quantity > 0) {
+            await createService({
+              name: service.templateName,
+              price: String(service.price),
+              quantity: service.quantity,
+              totalAmount: String(service.price * service.quantity),
+              saleDate: stat.date instanceof Date ? stat.date.toISOString().split('T')[0] : String(stat.date),
+              notes: `من إحصائية يومية #${stat.id}`,
+            });
+          }
+        }
+      } catch (e) {
+        console.error('Error parsing soldServices:', e);
+      }
+    }
   }
 
   return true;
@@ -4725,6 +4963,51 @@ export async function rejectDailyStat(id: number, reviewerId: number, reviewNote
     reviewedAt: new Date(),
     reviewNotes: reviewNotes,
   }).where(eq(dailyStats.id, id));
+
+  return true;
+}
+
+// Unapprove daily stat - إلغاء الموافقة على الإحصائية
+export async function unapproveDailyStat(id: number, reviewerId: number, reviewNotes?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get the stat first to check if it's approved and has course enrollment
+  const stat = await getDailyStatById(id);
+  if (!stat) throw new Error("Daily stat not found");
+  if (stat.status !== 'approved') throw new Error("Daily stat is not approved");
+
+  // Delete the course enrollment linked to this stat if exists
+  if (stat.courseId) {
+    // Try to find enrollment by dailyStatId first
+    let enrollments = await db.select().from(courseEnrollments)
+      .where(eq(courseEnrollments.dailyStatId, id));
+    
+    // If not found, try to find by notes (for older enrollments)
+    if (enrollments.length === 0) {
+      enrollments = await db.select().from(courseEnrollments)
+        .where(and(
+          eq(courseEnrollments.courseId, stat.courseId),
+          eq(courseEnrollments.notes, `إحصائية يومية #${id}`)
+        ));
+    }
+    
+    // Delete the enrollment
+    for (const enrollment of enrollments) {
+      await db.delete(courseEnrollments).where(eq(courseEnrollments.id, enrollment.id));
+    }
+  }
+
+  // Update the stat status back to pending
+  await db.update(dailyStats).set({
+    status: "pending",
+    reviewedBy: reviewerId,
+    reviewedAt: new Date(),
+    reviewNotes: reviewNotes ? `إلغاء الموافقة: ${reviewNotes}` : "تم إلغاء الموافقة",
+  }).where(eq(dailyStats.id, id));
+
+  // Update employee targets after unapproval
+  await updateEmployeeTargetsFromDailyStats(stat.employeeId);
 
   return true;
 }
@@ -5169,4 +5452,1306 @@ export async function logWebhookCall(data: {
     ...data
   }));
   return { success: true, logged: true };
+}
+
+
+// ============ STRATEGIC TARGETS BY PERIOD ============
+/**
+ * Get strategic target actuals for a specific period (monthly or quarterly)
+ * @param year - The year
+ * @param periodType - 'monthly' or 'quarterly'
+ * @param periodValue - Month (1-12) for monthly, Quarter (1-4) for quarterly
+ */
+export async function getStrategicTargetActualsByPeriod(
+  year: number,
+  periodType: 'monthly' | 'quarterly',
+  periodValue: number
+) {
+  const db = await getDb();
+  if (!db) return {};
+  
+  let startDate: string;
+  let endDate: string;
+  
+  if (periodType === 'monthly') {
+    // Monthly: specific month
+    const monthStart = new Date(year, periodValue - 1, 1);
+    const monthEnd = new Date(year, periodValue, 0);
+    startDate = monthStart.toISOString().split('T')[0];
+    endDate = monthEnd.toISOString().split('T')[0];
+  } else {
+    // Quarterly: Q1 (1-3), Q2 (4-6), Q3 (7-9), Q4 (10-12)
+    const quarterStartMonth = (periodValue - 1) * 3;
+    const quarterEndMonth = quarterStartMonth + 3;
+    const quarterStart = new Date(year, quarterStartMonth, 1);
+    const quarterEnd = new Date(year, quarterEndMonth, 0);
+    startDate = quarterStart.toISOString().split('T')[0];
+    endDate = quarterEnd.toISOString().split('T')[0];
+  }
+  
+  // Count direct courses (NEW course templates created in this period - not repeated courses)
+  const directCourseTemplates = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(courseTemplates)
+    .where(
+      and(
+        eq(courseTemplates.isActive, true),
+        sql`${courseTemplates.createdAt} >= ${startDate}`,
+        sql`${courseTemplates.createdAt} <= ${endDate}`
+      )
+    );
+  
+  // Count total courses held (from courses table - for reference)
+  const totalCoursesHeld = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(courses)
+    .where(
+      and(
+        ne(courses.status, "cancelled"),
+        sql`${courses.startDate} >= ${startDate}`,
+        sql`${courses.startDate} <= ${endDate}`
+      )
+    );
+  
+  // Count total customers (trainees)
+  const enrollmentData = await db
+    .select({ total: sql<number>`SUM(${courseEnrollments.traineeCount})` })
+    .from(courseEnrollments)
+    .innerJoin(courses, eq(courseEnrollments.courseId, courses.id))
+    .where(
+      and(
+        ne(courses.status, "cancelled"),
+        sql`${courses.startDate} >= ${startDate}`,
+        sql`${courses.startDate} <= ${endDate}`
+      )
+    );
+  
+  // Calculate profit for period
+  // Revenue from courses
+  const courseRevenue = await db
+    .select({ total: sql<number>`SUM(${courseEnrollments.paidAmount} * ${courseEnrollments.traineeCount})` })
+    .from(courseEnrollments)
+    .innerJoin(courses, eq(courseEnrollments.courseId, courses.id))
+    .where(
+      and(
+        ne(courses.status, "cancelled"),
+        sql`${courses.startDate} >= ${startDate}`,
+        sql`${courses.startDate} <= ${endDate}`
+      )
+    );
+  
+  // Revenue from services
+  const serviceRevenue = await db
+    .select({ total: sql<number>`SUM(${services.totalAmount})` })
+    .from(services)
+    .where(
+      and(
+        sql`${services.saleDate} >= ${startDate}`,
+        sql`${services.saleDate} <= ${endDate}`
+      )
+    );
+  
+  // Course expenses
+  const courseExp = await db
+    .select({ total: sql<number>`SUM(${courseExpenses.amount})` })
+    .from(courseExpenses)
+    .innerJoin(courses, eq(courseExpenses.courseId, courses.id))
+    .where(
+      and(
+        ne(courses.status, "cancelled"),
+        sql`${courses.startDate} >= ${startDate}`,
+        sql`${courses.startDate} <= ${endDate}`
+      )
+    );
+  
+  // Operational expenses for the period
+  let opExpTotal = 0;
+  if (periodType === 'monthly') {
+    const opExp = await db
+      .select({ total: sql<number>`SUM(${operationalExpenses.amount})` })
+      .from(operationalExpenses)
+      .where(
+        and(
+          eq(operationalExpenses.year, year),
+          eq(operationalExpenses.month, periodValue)
+        )
+      );
+    opExpTotal = parseFloat(opExp[0]?.total?.toString() || "0");
+  } else {
+    // Sum operational expenses for the quarter
+    const quarterMonths = [(periodValue - 1) * 3 + 1, (periodValue - 1) * 3 + 2, (periodValue - 1) * 3 + 3];
+    const opExp = await db
+      .select({ total: sql<number>`SUM(${operationalExpenses.amount})` })
+      .from(operationalExpenses)
+      .where(
+        and(
+          eq(operationalExpenses.year, year),
+          sql`${operationalExpenses.month} IN (${quarterMonths.join(',')})`
+        )
+      );
+    opExpTotal = parseFloat(opExp[0]?.total?.toString() || "0");
+  }
+  
+  const totalRevenue = (parseFloat(courseRevenue[0]?.total?.toString() || "0")) + 
+                       (parseFloat(serviceRevenue[0]?.total?.toString() || "0"));
+  const totalExpenses = (parseFloat(courseExp[0]?.total?.toString() || "0")) + opExpTotal;
+  const periodProfit = totalRevenue - totalExpenses;
+  
+  // Count partnerships
+  const entityPartnerships = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(partnerships)
+    .where(
+      and(
+        eq(partnerships.type, "entity"),
+        eq(partnerships.status, "active"),
+        sql`${partnerships.partnershipDate} >= ${startDate}`,
+        sql`${partnerships.partnershipDate} <= ${endDate}`
+      )
+    );
+  
+  const individualPartnerships = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(partnerships)
+    .where(
+      and(
+        eq(partnerships.type, "individual"),
+        eq(partnerships.status, "active"),
+        sql`${partnerships.partnershipDate} >= ${startDate}`,
+        sql`${partnerships.partnershipDate} <= ${endDate}`
+      )
+    );
+  
+  // Count innovative ideas
+  const ideas = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(innovativeIdeas)
+    .where(
+      and(
+        sql`${innovativeIdeas.submissionDate} >= ${startDate}`,
+        sql`${innovativeIdeas.submissionDate} <= ${endDate}`
+      )
+    );
+  
+  return {
+    direct_courses: directCourseTemplates[0]?.count || 0, // NEW course templates
+    new_courses: directCourseTemplates[0]?.count || 0, // Same as direct_courses
+    recorded_courses: 0,
+    customers: parseInt(enrollmentData[0]?.total?.toString() || "0"),
+    annual_profit: periodProfit,
+    entity_partnerships: entityPartnerships[0]?.count || 0,
+    individual_partnerships: individualPartnerships[0]?.count || 0,
+    innovative_ideas: ideas[0]?.count || 0,
+    service_quality: 0,
+    customer_satisfaction: 0,
+    website_quality: 0,
+  };
+}
+
+/**
+ * Get strategic targets with period-based breakdown
+ * Returns targets with monthly and quarterly divisions
+ */
+export async function getStrategicTargetsWithPeriods(year: number) {
+  const db = await getDb();
+  if (!db) return { targets: [], yearlyActuals: {}, monthlyActuals: [], quarterlyActuals: [] };
+  
+  // Get all targets for the year
+  const targets = await db
+    .select()
+    .from(strategicTargets)
+    .where(eq(strategicTargets.year, year))
+    .orderBy(strategicTargets.type);
+  
+  // Get yearly actuals
+  const yearlyActuals = await getStrategicTargetActuals(year);
+  
+  // Get monthly actuals for each month
+  const monthlyActuals = [];
+  for (let month = 1; month <= 12; month++) {
+    const actuals = await getStrategicTargetActualsByPeriod(year, 'monthly', month);
+    monthlyActuals.push({ month, actuals });
+  }
+  
+  // Get quarterly actuals
+  const quarterlyActuals = [];
+  for (let quarter = 1; quarter <= 4; quarter++) {
+    const actuals = await getStrategicTargetActualsByPeriod(year, 'quarterly', quarter);
+    quarterlyActuals.push({ quarter, actuals });
+  }
+  
+  return {
+    targets,
+    yearlyActuals,
+    monthlyActuals,
+    quarterlyActuals,
+  };
+}
+
+
+// ============ PUBLIC COURSES ============
+export async function listPublicCourses() {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(courses)
+    .where(eq(courses.status, "active"))
+    .orderBy(desc(courses.startDate));
+  
+  // Get fees, display settings, and instructor for each course
+  const coursesWithDetails = await Promise.all(result.map(async (course) => {
+    const fees = await db.select().from(courseFees).where(eq(courseFees.courseId, course.id));
+    const template = course.templateId 
+      ? await db.select().from(courseTemplates).where(eq(courseTemplates.id, course.templateId)).then(r => r[0])
+      : null;
+    const displaySettings = await db.select().from(courseDisplaySettings)
+      .where(eq(courseDisplaySettings.courseId, course.id)).then(r => r[0]);
+    const instructor = course.instructorId
+      ? await db.select().from(instructors).where(eq(instructors.id, course.instructorId)).then(r => r[0])
+      : null;
+    return {
+      ...course,
+      fees,
+      templateName: template?.name || null,
+      courseType: displaySettings?.courseType || "online_live",
+      isPublic: displaySettings?.isPublic ?? false,
+      price: displaySettings?.publicDiscountPrice || displaySettings?.publicPrice || null,
+      originalPrice: displaySettings?.publicPrice || null,
+      imageUrl: displaySettings?.imageUrl || null,
+      shortDescription: displaySettings?.shortDescription || course.description || null,
+      detailedDescription: displaySettings?.detailedDescription || null,
+      highlights: displaySettings?.highlights || null,
+      targetAudience: displaySettings?.targetAudience || null,
+      maxSeats: displaySettings?.maxSeats || null,
+      currentSeats: displaySettings?.currentSeats || 0,
+      location: displaySettings?.location || null,
+      meetingLink: displaySettings?.meetingLink || null,
+      videoPreviewUrl: displaySettings?.videoPreviewUrl || null,
+      thumbnailUrl: displaySettings?.thumbnailUrl || null,
+      instructorPhoto: instructor?.photoUrl || null,
+      instructorBio: instructor?.bio || null,
+    };
+  }));
+  
+  // Filter only public courses
+  return coursesWithDetails.filter(c => c.isPublic);
+}
+
+export async function getPublicCourseById(courseId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [course] = await db.select().from(courses).where(eq(courses.id, courseId));
+  if (!course) return null;
+  
+  const fees = await db.select().from(courseFees).where(eq(courseFees.courseId, courseId));
+  const template = course.templateId 
+    ? await db.select().from(courseTemplates).where(eq(courseTemplates.id, course.templateId)).then(r => r[0])
+    : null;
+  const displaySettings = await db.select().from(courseDisplaySettings)
+    .where(eq(courseDisplaySettings.courseId, courseId)).then(r => r[0]);
+  const instructor = course.instructorId
+    ? await db.select().from(instructors).where(eq(instructors.id, course.instructorId)).then(r => r[0])
+    : null;
+  
+  // Get registration count
+  const registrations = await db.select().from(publicRegistrations)
+    .where(eq(publicRegistrations.courseId, courseId));
+  
+  return {
+    ...course,
+    fees,
+    templateName: template?.name || null,
+    courseType: displaySettings?.courseType || "online_live",
+    isPublic: displaySettings?.isPublic ?? true,
+    price: displaySettings?.publicDiscountPrice || displaySettings?.publicPrice || null,
+    originalPrice: displaySettings?.publicPrice || null,
+    publicPrice: displaySettings?.publicPrice || null,
+    publicDiscountPrice: displaySettings?.publicDiscountPrice || null,
+    imageUrl: displaySettings?.imageUrl || null,
+    shortDescription: displaySettings?.shortDescription || course.description || null,
+    detailedDescription: displaySettings?.detailedDescription || null,
+    highlights: displaySettings?.highlights || null,
+    targetAudience: displaySettings?.targetAudience || null,
+    maxSeats: displaySettings?.maxSeats || null,
+    currentSeats: displaySettings?.currentSeats || 0,
+    location: displaySettings?.location || null,
+    meetingLink: displaySettings?.meetingLink || null,
+    videoPreviewUrl: displaySettings?.videoPreviewUrl || null,
+    thumbnailUrl: displaySettings?.thumbnailUrl || null,
+    instructorPhoto: instructor?.photoUrl || null,
+    instructorBio: instructor?.bio || null,
+    instructorEmail: instructor?.email || null,
+    instructorPhone: instructor?.phone || null,
+    registrationCount: registrations.length,
+  };
+}
+
+// ============ PUBLIC REGISTRATIONS ============
+export async function createPublicRegistration(data: InsertPublicRegistration) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(publicRegistrations).values(data);
+  return result.insertId;
+}
+
+export async function listPublicRegistrations(courseId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  if (courseId) {
+    return db.select().from(publicRegistrations)
+      .where(eq(publicRegistrations.courseId, courseId))
+      .orderBy(desc(publicRegistrations.createdAt));
+  }
+  return db.select().from(publicRegistrations).orderBy(desc(publicRegistrations.createdAt));
+}
+
+// ============ PUBLIC SERVICES ============
+export async function listActivePublicServices() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(publicServices)
+    .where(eq(publicServices.isActive, true))
+    .orderBy(publicServices.sortOrder);
+}
+
+export async function getPublicServiceById(serviceId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [service] = await db.select().from(publicServices).where(eq(publicServices.id, serviceId));
+  return service || null;
+}
+
+export async function createServiceOrder(data: InsertServiceOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(serviceOrders).values(data);
+  return result.insertId;
+}
+
+export async function listServiceOrders(serviceId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  if (serviceId) {
+    return db.select().from(serviceOrders)
+      .where(eq(serviceOrders.serviceId, serviceId))
+      .orderBy(desc(serviceOrders.createdAt));
+  }
+  return db.select().from(serviceOrders).orderBy(desc(serviceOrders.createdAt));
+}
+
+// ============ COURSE DISPLAY SETTINGS ============
+export async function getCourseDisplaySettings(courseId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [settings] = await db.select().from(courseDisplaySettings)
+    .where(eq(courseDisplaySettings.courseId, courseId));
+  return settings || null;
+}
+
+export async function upsertCourseDisplaySettings(courseId: number, data: Partial<InsertCourseDisplaySetting>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await getCourseDisplaySettings(courseId);
+  if (existing) {
+    await db.update(courseDisplaySettings)
+      .set({ ...data, courseId })
+      .where(eq(courseDisplaySettings.courseId, courseId));
+    return existing.id;
+  } else {
+    const [result] = await db.insert(courseDisplaySettings).values({ ...data, courseId } as InsertCourseDisplaySetting);
+    return result.insertId;
+  }
+}
+
+
+// ============ RECORDED COURSES SYSTEM ============
+
+// --- Recorded Courses CRUD ---
+export async function createRecordedCourse(data: InsertRecordedCourse) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(recordedCourses).values(data);
+  return result.insertId;
+}
+
+export async function getRecordedCourseById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [course] = await db.select().from(recordedCourses).where(eq(recordedCourses.id, id));
+  return course || null;
+}
+
+export async function listRecordedCourses(filters?: { status?: string; instructorId?: number }) {
+  const db = await getDb();
+  if (!db) return [];
+  let query = db.select().from(recordedCourses).orderBy(desc(recordedCourses.createdAt));
+  const conditions: any[] = [];
+  if (filters?.status) {
+    conditions.push(eq(recordedCourses.status, filters.status as any));
+  }
+  if (filters?.instructorId) {
+    conditions.push(eq(recordedCourses.instructorId, filters.instructorId));
+  }
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  return query;
+}
+
+export async function listPublishedRecordedCourses() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(recordedCourses)
+    .where(eq(recordedCourses.status, "published"))
+    .orderBy(desc(recordedCourses.publishedAt));
+}
+
+export async function updateRecordedCourse(id: number, data: Partial<InsertRecordedCourse>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(recordedCourses).set(data).where(eq(recordedCourses.id, id));
+}
+
+export async function deleteRecordedCourse(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Delete related data first
+  await db.delete(recordedCourseLessons).where(eq(recordedCourseLessons.courseId, id));
+  await db.delete(recordedCourseSections).where(eq(recordedCourseSections.courseId, id));
+  await db.delete(recordedCourseReviews).where(eq(recordedCourseReviews.courseId, id));
+  await db.delete(lessonProgress).where(eq(lessonProgress.courseId, id));
+  await db.delete(courseViewLogs).where(eq(courseViewLogs.courseId, id));
+  await db.delete(recordedCourses).where(eq(recordedCourses.id, id));
+}
+
+// --- Sections CRUD ---
+export async function createSection(data: InsertRecordedCourseSection) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(recordedCourseSections).values(data);
+  return result.insertId;
+}
+
+export async function listSections(courseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(recordedCourseSections)
+    .where(eq(recordedCourseSections.courseId, courseId))
+    .orderBy(recordedCourseSections.sortOrder);
+}
+
+export async function updateSection(id: number, data: Partial<InsertRecordedCourseSection>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(recordedCourseSections).set(data).where(eq(recordedCourseSections.id, id));
+}
+
+export async function deleteSection(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Delete lessons in section first
+  await db.delete(recordedCourseLessons).where(eq(recordedCourseLessons.sectionId, id));
+  await db.delete(recordedCourseSections).where(eq(recordedCourseSections.id, id));
+}
+
+// --- Lessons CRUD ---
+export async function createLesson(data: InsertRecordedCourseLesson) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(recordedCourseLessons).values(data);
+  return result.insertId;
+}
+
+export async function listLessons(courseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(recordedCourseLessons)
+    .where(eq(recordedCourseLessons.courseId, courseId))
+    .orderBy(recordedCourseLessons.sortOrder);
+}
+
+export async function listLessonsBySection(sectionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(recordedCourseLessons)
+    .where(eq(recordedCourseLessons.sectionId, sectionId))
+    .orderBy(recordedCourseLessons.sortOrder);
+}
+
+export async function updateLesson(id: number, data: Partial<InsertRecordedCourseLesson>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(recordedCourseLessons).set(data).where(eq(recordedCourseLessons.id, id));
+}
+
+export async function deleteLesson(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(recordedCourseLessons).where(eq(recordedCourseLessons.id, id));
+}
+
+// --- Enrollments ---
+export async function createRecordedEnrollment(data: InsertRecordedCourseEnrollment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(recordedCourseEnrollments).values(data);
+  // Update course enrollment count
+  await db.update(recordedCourses)
+    .set({ totalEnrollments: sql`totalEnrollments + 1` })
+    .where(eq(recordedCourses.id, data.courseId));
+  return result.insertId;
+}
+
+export async function listRecordedEnrollments(courseId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  if (courseId) {
+    return db.select().from(recordedCourseEnrollments)
+      .where(eq(recordedCourseEnrollments.courseId, courseId))
+      .orderBy(desc(recordedCourseEnrollments.enrolledAt));
+  }
+  return db.select().from(recordedCourseEnrollments)
+    .orderBy(desc(recordedCourseEnrollments.enrolledAt));
+}
+
+export async function getEnrollmentByUserAndCourse(userId: number, courseId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [enrollment] = await db.select().from(recordedCourseEnrollments)
+    .where(and(
+      eq(recordedCourseEnrollments.userId, userId),
+      eq(recordedCourseEnrollments.courseId, courseId)
+    ));
+  return enrollment || null;
+}
+
+// --- Lesson Progress ---
+export async function upsertLessonProgress(data: InsertLessonProgress) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const existing = await db.select().from(lessonProgress)
+    .where(and(
+      eq(lessonProgress.enrollmentId, data.enrollmentId!),
+      eq(lessonProgress.lessonId, data.lessonId!)
+    ));
+  if (existing.length > 0) {
+    await db.update(lessonProgress)
+      .set({ ...data })
+      .where(eq(lessonProgress.id, existing[0].id));
+    return existing[0].id;
+  }
+  const [result] = await db.insert(lessonProgress).values(data);
+  return result.insertId;
+}
+
+export async function getLessonProgressForEnrollment(enrollmentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(lessonProgress)
+    .where(eq(lessonProgress.enrollmentId, enrollmentId));
+}
+
+// --- Reviews ---
+export async function createReview(data: InsertRecordedCourseReview) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(recordedCourseReviews).values(data);
+  // Update average rating
+  const reviews = await db.select().from(recordedCourseReviews)
+    .where(eq(recordedCourseReviews.courseId, data.courseId));
+  const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  await db.update(recordedCourses)
+    .set({ averageRating: avgRating.toFixed(2) })
+    .where(eq(recordedCourses.id, data.courseId));
+  return result.insertId;
+}
+
+export async function listReviews(courseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(recordedCourseReviews)
+    .where(eq(recordedCourseReviews.courseId, courseId))
+    .orderBy(desc(recordedCourseReviews.createdAt));
+}
+
+// --- Instructor Earnings ---
+export async function createInstructorEarning(data: InsertInstructorEarning) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(instructorEarnings).values(data);
+  // Update course total revenue
+  await db.update(recordedCourses)
+    .set({ totalRevenue: sql`totalRevenue + ${data.totalAmount}` })
+    .where(eq(recordedCourses.id, data.courseId));
+  return result.insertId;
+}
+
+export async function getInstructorEarnings(instructorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(instructorEarnings)
+    .where(eq(instructorEarnings.instructorId, instructorId))
+    .orderBy(desc(instructorEarnings.createdAt));
+}
+
+export async function getInstructorEarningsSummary(instructorId: number) {
+  const db = await getDb();
+  if (!db) return { totalEarnings: 0, pendingEarnings: 0, paidEarnings: 0, totalEnrollments: 0 };
+  
+  const earnings = await db.select().from(instructorEarnings)
+    .where(eq(instructorEarnings.instructorId, instructorId));
+  
+  const totalEarnings = earnings.reduce((sum, e) => sum + parseFloat(e.instructorAmount as string || "0"), 0);
+  const pendingEarnings = earnings.filter(e => e.status === "pending" || e.status === "approved")
+    .reduce((sum, e) => sum + parseFloat(e.instructorAmount as string || "0"), 0);
+  const paidEarnings = earnings.filter(e => e.status === "paid")
+    .reduce((sum, e) => sum + parseFloat(e.instructorAmount as string || "0"), 0);
+  
+  return { totalEarnings, pendingEarnings, paidEarnings, totalEnrollments: earnings.length };
+}
+
+// --- Course Views ---
+export async function logCourseView(courseId: number, userId?: number, source?: string) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(courseViewLogs).values({ courseId, userId, source });
+  await db.update(recordedCourses)
+    .set({ totalViews: sql`totalViews + 1` })
+    .where(eq(recordedCourses.id, courseId));
+}
+
+export async function getCourseViewStats(courseId: number) {
+  const db = await getDb();
+  if (!db) return { totalViews: 0, last30Days: 0, last7Days: 0 };
+  
+  const allViews = await db.select({ count: sql<number>`count(*)` })
+    .from(courseViewLogs)
+    .where(eq(courseViewLogs.courseId, courseId));
+  
+  return { totalViews: allViews[0]?.count || 0, last30Days: 0, last7Days: 0 };
+}
+
+// --- Get recorded courses by instructor user ---
+export async function getRecordedCoursesByInstructorUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(recordedCourses)
+    .where(eq(recordedCourses.submittedByUserId, userId))
+    .orderBy(desc(recordedCourses.createdAt));
+}
+
+// --- Get full course with sections and lessons ---
+export async function getRecordedCourseWithContent(courseId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [course] = await db.select().from(recordedCourses).where(eq(recordedCourses.id, courseId));
+  if (!course) return null;
+  
+  const sections = await db.select().from(recordedCourseSections)
+    .where(eq(recordedCourseSections.courseId, courseId))
+    .orderBy(recordedCourseSections.sortOrder);
+  
+  const lessons = await db.select().from(recordedCourseLessons)
+    .where(eq(recordedCourseLessons.courseId, courseId))
+    .orderBy(recordedCourseLessons.sortOrder);
+  
+  // Get instructor info
+  const [instructor] = await db.select().from(instructors)
+    .where(eq(instructors.id, course.instructorId));
+  
+  const sectionsWithLessons = sections.map(section => ({
+    ...section,
+    lessons: lessons.filter(l => l.sectionId === section.id),
+  }));
+  
+  return { ...course, instructor: instructor || null, sections: sectionsWithLessons };
+}
+
+// --- Update course stats (totalDuration, totalLessons) ---
+export async function updateRecordedCourseStats(courseId: number) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const lessons = await db.select().from(recordedCourseLessons)
+    .where(eq(recordedCourseLessons.courseId, courseId));
+  
+  const totalDuration = lessons.reduce((sum, l) => sum + (l.duration || 0), 0);
+  const totalLessons = lessons.length;
+  
+  await db.update(recordedCourses)
+    .set({ totalDuration: Math.floor(totalDuration / 60), totalLessons })
+    .where(eq(recordedCourses.id, courseId));
+}
+
+
+// =============================================
+// PAYMENTS
+// =============================================
+
+export async function createPayment(data: InsertPayment) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(payments).values(data);
+  return result.insertId;
+}
+
+export async function getPaymentById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [payment] = await db.select().from(payments).where(eq(payments.id, id));
+  return payment || null;
+}
+
+export async function getPaymentByExternalId(externalPaymentId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [payment] = await db.select().from(payments).where(eq(payments.externalPaymentId, externalPaymentId));
+  return payment || null;
+}
+
+export async function updatePaymentStatus(id: number, status: string, externalPaymentId?: string, paidAt?: Date) {
+  const db = await getDb();
+  if (!db) return;
+  const updateData: any = { paymentStatus: status };
+  if (externalPaymentId) updateData.externalPaymentId = externalPaymentId;
+  if (paidAt) updateData.paidAt = paidAt;
+  await db.update(payments).set(updateData).where(eq(payments.id, id));
+}
+
+export async function getUserPayments(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(payments).where(eq(payments.userId, userId)).orderBy(desc(payments.createdAt));
+}
+
+export async function getAllPayments(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(payments).orderBy(desc(payments.createdAt)).limit(limit).offset(offset);
+}
+
+// =============================================
+// COURSE REVIEWS (new table - courseReviews)
+// =============================================
+
+export async function createCourseReviewNew(data: InsertCourseReview) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(courseReviews).values(data);
+  return result.insertId;
+}
+
+export async function getCourseReviewsNew(courseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(courseReviews)
+    .where(and(eq(courseReviews.recordedCourseId, courseId), eq(courseReviews.isVisible, true)))
+    .orderBy(desc(courseReviews.createdAt));
+}
+
+export async function getUserCourseReview(courseId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [review] = await db.select().from(courseReviews)
+    .where(and(eq(courseReviews.recordedCourseId, courseId), eq(courseReviews.userId, userId)));
+  return review || null;
+}
+
+export async function updateCourseReviewNew(id: number, data: Partial<InsertCourseReview>) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(courseReviews).set(data).where(eq(courseReviews.id, id));
+}
+
+export async function deleteCourseReviewNew(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(courseReviews).where(eq(courseReviews.id, id));
+}
+
+export async function getCourseAverageRating(courseId: number) {
+  const db = await getDb();
+  if (!db) return { average: 0, count: 0 };
+  const reviews = await db.select().from(courseReviews)
+    .where(and(eq(courseReviews.recordedCourseId, courseId), eq(courseReviews.isVisible, true)));
+  if (reviews.length === 0) return { average: 0, count: 0 };
+  const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+  return { average: sum / reviews.length, count: reviews.length };
+}
+
+export async function getAllCourseReviewsAdmin(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(courseReviews).orderBy(desc(courseReviews.createdAt)).limit(limit).offset(offset);
+}
+
+// =============================================
+// CERTIFICATES
+// =============================================
+
+export async function createCertificate(data: InsertCertificate) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(certificates).values(data);
+  return result.insertId;
+}
+
+export async function getCertificateByEnrollment(enrollmentId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [cert] = await db.select().from(certificates).where(eq(certificates.enrollmentId, enrollmentId));
+  return cert || null;
+}
+
+export async function getCertificateByNumber(certNumber: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [cert] = await db.select().from(certificates).where(eq(certificates.certificateNumber, certNumber));
+  return cert || null;
+}
+
+export async function getUserCertificates(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(certificates).where(eq(certificates.userId, userId)).orderBy(desc(certificates.issuedAt));
+}
+
+export async function getCourseCertificatesCount(courseId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  const certs = await db.select().from(certificates).where(eq(certificates.recordedCourseId, courseId));
+  return certs.length;
+}
+
+
+// =============================================
+// Quiz Functions
+// =============================================
+
+export async function createQuiz(data: InsertQuiz) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(quizzes).values(data);
+  return result.insertId;
+}
+
+export async function getQuizById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [quiz] = await db.select().from(quizzes).where(eq(quizzes.id, id));
+  return quiz || null;
+}
+
+export async function getQuizByLessonId(lessonId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [quiz] = await db.select().from(quizzes).where(eq(quizzes.lessonId, lessonId));
+  return quiz || null;
+}
+
+export async function updateQuiz(id: number, data: Partial<InsertQuiz>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(quizzes).set(data).where(eq(quizzes.id, id));
+}
+
+export async function deleteQuiz(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Delete answers first, then questions, then quiz
+  const questions = await db.select().from(quizQuestions).where(eq(quizQuestions.quizId, id));
+  for (const q of questions) {
+    await db.delete(quizAnswers).where(eq(quizAnswers.questionId, q.id));
+  }
+  await db.delete(quizQuestions).where(eq(quizQuestions.quizId, id));
+  await db.delete(quizAttempts).where(eq(quizAttempts.quizId, id));
+  await db.delete(quizzes).where(eq(quizzes.id, id));
+}
+
+// --- Quiz Questions ---
+export async function createQuizQuestion(data: InsertQuizQuestion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(quizQuestions).values(data);
+  return result.insertId;
+}
+
+export async function getQuizQuestions(quizId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(quizQuestions)
+    .where(eq(quizQuestions.quizId, quizId))
+    .orderBy(quizQuestions.sortOrder);
+}
+
+export async function updateQuizQuestion(id: number, data: Partial<InsertQuizQuestion>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(quizQuestions).set(data).where(eq(quizQuestions.id, id));
+}
+
+export async function deleteQuizQuestion(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(quizAnswers).where(eq(quizAnswers.questionId, id));
+  await db.delete(quizQuestions).where(eq(quizQuestions.id, id));
+}
+
+// --- Quiz Answers ---
+export async function createQuizAnswer(data: InsertQuizAnswer) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(quizAnswers).values(data);
+  return result.insertId;
+}
+
+export async function getQuizAnswers(questionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(quizAnswers)
+    .where(eq(quizAnswers.questionId, questionId))
+    .orderBy(quizAnswers.sortOrder);
+}
+
+export async function updateQuizAnswer(id: number, data: Partial<InsertQuizAnswer>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(quizAnswers).set(data).where(eq(quizAnswers.id, id));
+}
+
+export async function deleteQuizAnswer(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(quizAnswers).where(eq(quizAnswers.id, id));
+}
+
+export async function setQuizAnswers(questionId: number, answers: InsertQuizAnswer[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Delete existing answers
+  await db.delete(quizAnswers).where(eq(quizAnswers.questionId, questionId));
+  // Insert new answers
+  if (answers.length > 0) {
+    await db.insert(quizAnswers).values(answers.map(a => ({ ...a, questionId })));
+  }
+}
+
+// --- Quiz with full content ---
+export async function getQuizWithQuestions(quizId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [quiz] = await db.select().from(quizzes).where(eq(quizzes.id, quizId));
+  if (!quiz) return null;
+  
+  const questions = await db.select().from(quizQuestions)
+    .where(eq(quizQuestions.quizId, quizId))
+    .orderBy(quizQuestions.sortOrder);
+  
+  const questionsWithAnswers = await Promise.all(
+    questions.map(async (q) => {
+      const answers = await db.select().from(quizAnswers)
+        .where(eq(quizAnswers.questionId, q.id))
+        .orderBy(quizAnswers.sortOrder);
+      return { ...q, answers };
+    })
+  );
+  
+  return { ...quiz, questions: questionsWithAnswers };
+}
+
+// --- Quiz Attempts ---
+export async function createQuizAttempt(data: InsertQuizAttempt) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(quizAttempts).values(data);
+  return result.insertId;
+}
+
+export async function getQuizAttempts(quizId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(quizAttempts)
+    .where(and(eq(quizAttempts.quizId, quizId), eq(quizAttempts.userId, userId)))
+    .orderBy(desc(quizAttempts.createdAt));
+}
+
+export async function getQuizAttemptById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [attempt] = await db.select().from(quizAttempts).where(eq(quizAttempts.id, id));
+  return attempt || null;
+}
+
+export async function updateQuizAttempt(id: number, data: Partial<InsertQuizAttempt>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(quizAttempts).set(data).where(eq(quizAttempts.id, id));
+}
+
+
+// ============================================
+// Target Alerts - تنبيهات المستهدفات
+// ============================================
+
+const targetTypeLabelsAr: Record<string, string> = {
+  targeted_customers: "العملاء المستهدفين",
+  confirmed_customers: "العملاء المؤكدين",
+  registered_customers: "العملاء المسجلين في النموذج",
+  services_sold: "الخدمات المباعة",
+  retargeting: "إعادة الاستهداف",
+  daily_calls: "المكالمات اليومية",
+  campaigns: "الحملات",
+  leads_generated: "العملاء المحتملين",
+  conversion_rate: "معدل التحويل",
+  features_completed: "المهام المنجزة",
+  bugs_fixed: "الأخطاء المصلحة",
+  sales_amount: "مبلغ المبيعات",
+  customer_satisfaction: "رضا العملاء",
+  attendance_hours: "ساعات الحضور",
+  contacted_old_customers: "العملاء القدامى المتواصل معهم",
+  other: "أخرى",
+};
+
+/**
+ * فحص وإنشاء تنبيهات تلقائية عند وصول الموظف لـ 80% أو 100% من المستهدف
+ * يتم استدعاؤها تلقائياً بعد حساب المستهدفات
+ */
+export async function checkAndCreateTargetAlerts(
+  employeeId: number,
+  targetsWithProgress: Array<{
+    id: number;
+    targetType: string;
+    customName?: string | null;
+    targetValue: string | number;
+    achieved: number;
+    percentage: number;
+    month?: number | null;
+    year: number;
+    status: string;
+  }>
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const createdAlerts: any[] = [];
+
+  for (const target of targetsWithProgress) {
+    const percentage = target.percentage;
+    const targetVal = parseFloat(String(target.targetValue)) || 0;
+    
+    if (targetVal <= 0) continue;
+
+    // فحص 80% و 100%
+    const thresholds: Array<{ type: "reached_80" | "reached_100"; minPercent: number }> = [
+      { type: "reached_80", minPercent: 80 },
+      { type: "reached_100", minPercent: 100 },
+    ];
+
+    for (const threshold of thresholds) {
+      if (percentage < threshold.minPercent) continue;
+
+      // فحص عدم وجود تنبيه مكرر لنفس المستهدف ونفس النوع
+      const existing = await db.select()
+        .from(targetAlerts)
+        .where(and(
+          eq(targetAlerts.targetId, target.id),
+          eq(targetAlerts.alertType, threshold.type)
+        ));
+
+      if (existing.length > 0) continue;
+
+      // جلب اسم الموظف
+      const employee = await getEmployeeById(employeeId);
+      const employeeName = employee?.name || `موظف #${employeeId}`;
+      const targetName = target.customName || targetTypeLabelsAr[target.targetType] || target.targetType;
+
+      let message = "";
+      if (threshold.type === "reached_80") {
+        message = `🎯 ${employeeName} وصل إلى ${Math.round(percentage)}% من مستهدف "${targetName}" (${target.achieved} من ${targetVal}). استمر في التقدم!`;
+      } else {
+        message = `🏆 تهانينا! ${employeeName} حقق مستهدف "${targetName}" بنسبة ${Math.round(percentage)}% (${target.achieved} من ${targetVal})!`;
+      }
+
+      // إنشاء التنبيه
+      const [result] = await db.insert(targetAlerts).values({
+        employeeId,
+        targetId: target.id,
+        alertType: threshold.type,
+        percentage: String(Math.round(percentage)),
+        targetType: target.targetType,
+        targetValue: String(targetVal),
+        achievedValue: String(target.achieved),
+        message,
+        isRead: false,
+        notifiedOwner: false,
+        month: target.month || null,
+        year: target.year,
+      });
+
+      createdAlerts.push({
+        id: result.insertId,
+        alertType: threshold.type,
+        employeeName,
+        targetName,
+        percentage: Math.round(percentage),
+        message,
+      });
+    }
+  }
+
+  return createdAlerts;
+}
+
+/**
+ * إرسال إشعارات المالك للتنبيهات غير المرسلة
+ */
+export async function sendPendingAlertNotifications() {
+  const db = await getDb();
+  if (!db) return;
+
+  const { notifyOwner } = await import("./_core/notification");
+
+  const pendingAlerts = await db.select()
+    .from(targetAlerts)
+    .where(eq(targetAlerts.notifiedOwner, false))
+    .orderBy(targetAlerts.createdAt);
+
+  for (const alert of pendingAlerts) {
+    try {
+      const title = alert.alertType === "reached_100"
+        ? `🏆 إنجاز مستهدف - ${alert.message?.split(" ")[1] || "موظف"}`
+        : `🎯 تقدم ملحوظ - ${alert.message?.split(" ")[1] || "موظف"}`;
+
+      await notifyOwner({
+        title,
+        content: alert.message || "",
+      });
+
+      // تحديث حالة الإشعار
+      await db.update(targetAlerts)
+        .set({ notifiedOwner: true })
+        .where(eq(targetAlerts.id, alert.id));
+    } catch (error) {
+      console.error(`[TargetAlerts] Failed to notify owner for alert ${alert.id}:`, error);
+    }
+  }
+}
+
+/**
+ * جلب جميع التنبيهات مع بيانات الموظف
+ */
+export async function listTargetAlerts(filters?: {
+  employeeId?: number;
+  alertType?: string;
+  isRead?: boolean;
+  month?: number;
+  year?: number;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions: any[] = [];
+  
+  if (filters?.employeeId) {
+    conditions.push(eq(targetAlerts.employeeId, filters.employeeId));
+  }
+  if (filters?.alertType) {
+    conditions.push(eq(targetAlerts.alertType, filters.alertType as any));
+  }
+  if (filters?.isRead !== undefined) {
+    conditions.push(eq(targetAlerts.isRead, filters.isRead));
+  }
+  if (filters?.month) {
+    conditions.push(eq(targetAlerts.month, filters.month));
+  }
+  if (filters?.year) {
+    conditions.push(eq(targetAlerts.year, filters.year));
+  }
+
+  const query = db.select({
+    alert: targetAlerts,
+    employeeName: employees.name,
+    employeeImage: employees.profileImage,
+  })
+    .from(targetAlerts)
+    .leftJoin(employees, eq(targetAlerts.employeeId, employees.id))
+    .orderBy(desc(targetAlerts.createdAt));
+
+  if (conditions.length > 0) {
+    query.where(and(...conditions));
+  }
+
+  if (filters?.limit) {
+    query.limit(filters.limit);
+  }
+
+  const results = await query;
+  
+  return results.map(r => ({
+    ...r.alert,
+    employeeName: r.employeeName,
+    employeeImage: r.employeeImage,
+  }));
+}
+
+/**
+ * تحديث حالة قراءة التنبيه
+ */
+export async function markAlertAsRead(alertId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(targetAlerts)
+    .set({ isRead: true })
+    .where(eq(targetAlerts.id, alertId));
+}
+
+/**
+ * تحديث جميع التنبيهات كمقروءة
+ */
+export async function markAllAlertsAsRead(employeeId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  if (employeeId) {
+    await db.update(targetAlerts)
+      .set({ isRead: true })
+      .where(and(
+        eq(targetAlerts.employeeId, employeeId),
+        eq(targetAlerts.isRead, false)
+      ));
+  } else {
+    await db.update(targetAlerts)
+      .set({ isRead: true })
+      .where(eq(targetAlerts.isRead, false));
+  }
+}
+
+/**
+ * عدد التنبيهات غير المقروءة
+ */
+export async function getUnreadAlertCount(employeeId?: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const conditions: any[] = [eq(targetAlerts.isRead, false)];
+  if (employeeId) {
+    conditions.push(eq(targetAlerts.employeeId, employeeId));
+  }
+
+  const result = await db.select({ count: count() })
+    .from(targetAlerts)
+    .where(and(...conditions));
+
+  return result[0]?.count || 0;
+}
+
+/**
+ * حذف تنبيه
+ */
+export async function deleteTargetAlert(alertId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(targetAlerts).where(eq(targetAlerts.id, alertId));
 }

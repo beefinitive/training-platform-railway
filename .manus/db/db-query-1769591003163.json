@@ -1,0 +1,55 @@
+{
+  "query": "SELECT ce.id, ce.courseId, ce.enrollmentDate, ce.traineeCount, ce.paidAmount, c.name as courseName, c.startDate as courseStartDate\nFROM courseEnrollments ce \nJOIN courses c ON ce.courseId = c.id\nWHERE c.name LIKE '%تسويق%' OR c.name LIKE '%التسويق%'\nORDER BY c.startDate DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT ce.id, ce.courseId, ce.enrollmentDate, ce.traineeCount, ce.paidAmount, c.name as courseName, c.startDate as courseStartDate\nFROM courseEnrollments ce \nJOIN courses c ON ce.courseId = c.id\nWHERE c.name LIKE '%تسويق%' OR c.name LIKE '%التسويق%'\nORDER BY c.startDate DESC;",
+  "rows": [
+    {
+      "id": "240001",
+      "courseId": "180002",
+      "enrollmentDate": "2026-01-13",
+      "traineeCount": "3",
+      "paidAmount": "400.00",
+      "courseName": "التسويق الإلكتروني - فبراير 2026",
+      "courseStartDate": "2026-02-26"
+    },
+    {
+      "id": "150020",
+      "courseId": "150009",
+      "enrollmentDate": "2025-02-02",
+      "traineeCount": "6",
+      "paidAmount": "400.00",
+      "courseName": "التسويق الإلكتروني",
+      "courseStartDate": "2025-02-02"
+    },
+    {
+      "id": "150021",
+      "courseId": "150009",
+      "enrollmentDate": "2025-02-02",
+      "traineeCount": "1",
+      "paidAmount": "350.00",
+      "courseName": "التسويق الإلكتروني",
+      "courseStartDate": "2025-02-02"
+    },
+    {
+      "id": "150027",
+      "courseId": "150013",
+      "enrollmentDate": "2025-01-01",
+      "traineeCount": "9",
+      "paidAmount": "400.00",
+      "courseName": "التسويق الإلكتروني",
+      "courseStartDate": "2025-01-15"
+    },
+    {
+      "id": "150028",
+      "courseId": "150013",
+      "enrollmentDate": "2025-01-01",
+      "traineeCount": "3",
+      "paidAmount": "350.00",
+      "courseName": "التسويق الإلكتروني",
+      "courseStartDate": "2025-01-15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcourseId\tenrollmentDate\ttraineeCount\tpaidAmount\tcourseName\tcourseStartDate\n240001\t180002\t2026-01-13\t3\t400.00\tالتسويق الإلكتروني - فبراير 2026\t2026-02-26\n150020\t150009\t2025-02-02\t6\t400.00\tالتسويق الإلكتروني\t2025-02-02\n150021\t150009\t2025-02-02\t1\t350.00\tالتسويق الإلكتروني\t2025-02-02\n150027\t150013\t2025-01-01\t9\t400.00\tالتسويق الإلكتروني\t2025-01-15\n150028\t150013\t2025-01-01\t3\t350.00\tالتسويق الإلكتروني\t2025-01-15\n",
+  "stderr": "",
+  "execution_time_ms": 1533
+}

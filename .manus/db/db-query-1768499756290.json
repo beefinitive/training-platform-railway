@@ -1,0 +1,30 @@
+{
+  "query": "SELECT e.id, e.name, et.targetType, et.targetValue, et.currentValue, et.baseValue, et.month, et.year \nFROM employees e \nLEFT JOIN employeeTargets et ON e.id = et.employeeId \nWHERE e.name LIKE '%غادة%' AND et.month = 1 AND et.year = 2026;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT e.id, e.name, et.targetType, et.targetValue, et.currentValue, et.baseValue, et.month, et.year \nFROM employees e \nLEFT JOIN employeeTargets et ON e.id = et.employeeId \nWHERE e.name LIKE '%غادة%' AND et.month = 1 AND et.year = 2026;",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "targetType": "confirmed_customers",
+      "targetValue": "35.00",
+      "currentValue": "10.00",
+      "baseValue": "0.00",
+      "month": "1",
+      "year": "2026"
+    },
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "targetType": "sales_amount",
+      "targetValue": "9000.00",
+      "currentValue": "0.00",
+      "baseValue": "0.00",
+      "month": "1",
+      "year": "2026"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttargetType\ttargetValue\tcurrentValue\tbaseValue\tmonth\tyear\n300001\tغادة حسن بسيوني\tconfirmed_customers\t35.00\t10.00\t0.00\t1\t2026\n300001\tغادة حسن بسيوني\tsales_amount\t9000.00\t0.00\t0.00\t1\t2026\n",
+  "stderr": "",
+  "execution_time_ms": 1510
+}

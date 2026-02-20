@@ -1,0 +1,8 @@
+{
+  "query": "SELECT e.id, e.name, et.targetType, et.targetValue, et.currentValue, et.baseValue, et.month, et.year \nFROM employees e \nLEFT JOIN employee_targets et ON e.id = et.employeeId \nWHERE e.name LIKE '%غادة%' AND et.month = 1 AND et.year = 2026;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT e.id, e.name, et.targetType, et.targetValue, et.currentValue, et.baseValue, et.month, et.year \nFROM employees e \nLEFT JOIN employee_targets et ON e.id = et.employeeId \nWHERE e.name LIKE '%غادة%' AND et.month = 1 AND et.year = 2026;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table '2cfui6dkdoaqsg5hbwxu6r.employee_targets' doesn't exist"
+  ]
+}

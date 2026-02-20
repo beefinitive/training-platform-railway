@@ -127,4 +127,9 @@ export const PERMISSIONS = {
   EMPLOYEES_CREATE: 'employees.create',
   EMPLOYEES_EDIT: 'employees.edit',
   EMPLOYEES_DELETE: 'employees.delete',
+  
+  // Employee Performance & Stats Review
+  EMPLOYEE_PERFORMANCE_VIEW: 'employee_performance.view', // الاطلاع على أداء الموظفين
+  EMPLOYEE_STATS_REVIEW: 'employee_stats.review', // مراجعة الإحصائيات
+  EMPLOYEE_TARGETS_VIEW: 'employee_targets.view', // مستهدفات الموظفين
 } as const;

@@ -1,0 +1,70 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'employees' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'employees' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "name",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "email",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "phone",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "specialization",
+      "DATA_TYPE": "enum"
+    },
+    {
+      "COLUMN_NAME": "userId",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "hireDate",
+      "DATA_TYPE": "date"
+    },
+    {
+      "COLUMN_NAME": "salary",
+      "DATA_TYPE": "decimal"
+    },
+    {
+      "COLUMN_NAME": "workType",
+      "DATA_TYPE": "enum"
+    },
+    {
+      "COLUMN_NAME": "status",
+      "DATA_TYPE": "enum"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "profileImage",
+      "DATA_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "nationalId",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "employeeCode",
+      "DATA_TYPE": "varchar"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\nid\tint\nname\tvarchar\nemail\tvarchar\nphone\tvarchar\nspecialization\tenum\nuserId\tint\nhireDate\tdate\nsalary\tdecimal\nworkType\tenum\nstatus\tenum\ncreatedAt\ttimestamp\nupdatedAt\ttimestamp\nprofileImage\ttext\nnationalId\tvarchar\nemployeeCode\tvarchar\n",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

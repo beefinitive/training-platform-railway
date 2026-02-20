@@ -1,0 +1,21 @@
+{
+  "query": "SELECT id, employeeId, courseId, confirmedCustomers, courseFee, calculatedRevenue, status, reviewedBy, reviewedAt \nFROM daily_stats \nWHERE status = 'approved' \nORDER BY reviewedAt DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, employeeId, courseId, confirmedCustomers, courseFee, calculatedRevenue, status, reviewedBy, reviewedAt \nFROM daily_stats \nWHERE status = 'approved' \nORDER BY reviewedAt DESC \nLIMIT 5;",
+  "rows": [
+    {
+      "id": "60001",
+      "employeeId": "240001",
+      "courseId": "180002",
+      "confirmedCustomers": "3",
+      "courseFee": "400.00",
+      "calculatedRevenue": "1200.00",
+      "status": "approved",
+      "reviewedBy": "1",
+      "reviewedAt": "2026-01-15 12:04:55"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temployeeId\tcourseId\tconfirmedCustomers\tcourseFee\tcalculatedRevenue\tstatus\treviewedBy\treviewedAt\n60001\t240001\t180002\t3\t400.00\t1200.00\tapproved\t1\t2026-01-15 12:04:55\n",
+  "stderr": "",
+  "execution_time_ms": 1499
+}

@@ -37,7 +37,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ar-SA', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 0,

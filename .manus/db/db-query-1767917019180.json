@@ -1,0 +1,19 @@
+{
+  "query": "SELECT * FROM projects;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM projects;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "شموخ القرآن",
+      "description": "مشروع خدمات تحفيظ القرآن الكريم - حساب منفصل عن الحسابات الرئيسية",
+      "includeInReports": "1",
+      "status": "active",
+      "createdAt": "2026-01-08 23:43:09",
+      "updatedAt": "2026-01-08 23:51:20"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tdescription\tincludeInReports\tstatus\tcreatedAt\tupdatedAt\n1\tشموخ القرآن\tمشروع خدمات تحفيظ القرآن الكريم - حساب منفصل عن الحسابات الرئيسية\t1\tactive\t2026-01-08 23:43:09\t2026-01-08 23:51:20\n",
+  "stderr": "",
+  "execution_time_ms": 1527
+}

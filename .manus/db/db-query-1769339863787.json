@@ -1,0 +1,70 @@
+{
+  "query": "SELECT rp.roleId, rp.permissionId, p.name as permission_name, p.description\nFROM rolePermissions rp\nJOIN permissions p ON rp.permissionId = p.id\nWHERE rp.roleId = (SELECT roleId FROM users WHERE email = 'dinanabil@gmail.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT rp.roleId, rp.permissionId, p.name as permission_name, p.description\nFROM rolePermissions rp\nJOIN permissions p ON rp.permissionId = p.id\nWHERE rp.roleId = (SELECT roleId FROM users WHERE email = 'dinanabil@gmail.com');",
+  "rows": [
+    {
+      "roleId": "3",
+      "permissionId": "1",
+      "permission_name": "dashboard.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "2",
+      "permission_name": "courses.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "6",
+      "permission_name": "templates.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "10",
+      "permission_name": "instructors.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "14",
+      "permission_name": "services.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "22",
+      "permission_name": "targets.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "26",
+      "permission_name": "partnerships.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "30",
+      "permission_name": "ideas.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "34",
+      "permission_name": "reports.view",
+      "description": "NULL"
+    },
+    {
+      "roleId": "3",
+      "permissionId": "36",
+      "permission_name": "archive.view",
+      "description": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "roleId\tpermissionId\tpermission_name\tdescription\n3\t1\tdashboard.view\tNULL\n3\t2\tcourses.view\tNULL\n3\t6\ttemplates.view\tNULL\n3\t10\tinstructors.view\tNULL\n3\t14\tservices.view\tNULL\n3\t22\ttargets.view\tNULL\n3\t26\tpartnerships.view\tNULL\n3\t30\tideas.view\tNULL\n3\t34\treports.view\tNULL\n3\t36\tarchive.view\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

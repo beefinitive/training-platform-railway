@@ -1,0 +1,16 @@
+{
+  "query": "SELECT c.id, c.name, c.startDate, c.endDate FROM courses c WHERE c.name LIKE '%تسويق%فبراير%' OR c.id = (SELECT id FROM courses WHERE name LIKE '%تسويق%' ORDER BY startDate DESC LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT c.id, c.name, c.startDate, c.endDate FROM courses c WHERE c.name LIKE '%تسويق%فبراير%' OR c.id = (SELECT id FROM courses WHERE name LIKE '%تسويق%' ORDER BY startDate DESC LIMIT 1);",
+  "rows": [
+    {
+      "id": "180002",
+      "name": "التسويق الإلكتروني - فبراير 2026",
+      "startDate": "2026-02-26",
+      "endDate": "2026-02-28"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tstartDate\tendDate\n180002\tالتسويق الإلكتروني - فبراير 2026\t2026-02-26\t2026-02-28\n",
+  "stderr": "",
+  "execution_time_ms": 1565
+}

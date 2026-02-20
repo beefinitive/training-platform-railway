@@ -1,0 +1,17 @@
+{
+  "query": "SELECT e.id, e.name, e.userId, u.name as userName, u.email \nFROM employees e \nLEFT JOIN users u ON e.userId = u.id \nWHERE u.email = 'ghadahassen28@gmail.com' OR e.name LIKE '%غادة حسن%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT e.id, e.name, e.userId, u.name as userName, u.email \nFROM employees e \nLEFT JOIN users u ON e.userId = u.id \nWHERE u.email = 'ghadahassen28@gmail.com' OR e.name LIKE '%غادة حسن%';",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "غادة حسن بسيوني",
+      "userId": "NULL",
+      "userName": "NULL",
+      "email": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tuserId\tuserName\temail\n300001\tغادة حسن بسيوني\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1602
+}

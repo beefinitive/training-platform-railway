@@ -21,7 +21,7 @@ const quarterLabels = ["الربع الأول", "الربع الثاني", "ال
 const halfLabels = ["النصف الأول", "النصف الثاني"];
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ar-SA', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 0,
@@ -546,6 +546,54 @@ export default function Reports() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Services Details Table */}
+        {reportType === "monthly" && monthlyServices && monthlyServices.services && monthlyServices.services.length > 0 && (
+          <Card className="border-border/50">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <ShoppingBag className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-lg">تفاصيل الخدمات المباعة</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">اسم الخدمة</TableHead>
+                      <TableHead className="text-center">السعر</TableHead>
+                      <TableHead className="text-center">الكمية</TableHead>
+                      <TableHead className="text-center">الإجمالي</TableHead>
+                      <TableHead className="text-center">التاريخ</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {monthlyServices.services.map((service: any) => (
+                      <TableRow key={service.id}>
+                        <TableCell className="font-medium">{service.serviceName}</TableCell>
+                        <TableCell className="text-center">{formatCurrency(parseFloat(service.price))}</TableCell>
+                        <TableCell className="text-center">{service.quantity}</TableCell>
+                        <TableCell className="text-center font-medium text-blue-600">
+                          {formatCurrency(parseFloat(service.price) * service.quantity)}
+                        </TableCell>
+                        <TableCell className="text-center text-muted-foreground">
+                          {new Date(service.date).toLocaleDateString('ar-SA')}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                <span className="font-bold">إجمالي الخدمات المباعة</span>
+                <span className="font-bold text-blue-600 text-lg">
+                  {formatCurrency(monthlyServices.totalRevenue || 0)}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Summary Table */}
         <Card className="border-border/50">

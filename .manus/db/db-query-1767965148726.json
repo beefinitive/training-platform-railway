@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, email, name, status, password FROM users WHERE email = 'mahaccount@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, email, name, status, password FROM users WHERE email = 'mahaccount@gmail.com';",
+  "rows": [
+    {
+      "id": "720166",
+      "email": "mahaccount@gmail.com",
+      "name": "محمود",
+      "status": "active",
+      "password": "$2b$10$AV25Jpt348FrjfB40CkSwOV1CjpwNYHavBq/gdgnYuHHVzzsQ7Bvy"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tstatus\tpassword\n720166\tmahaccount@gmail.com\tمحمود\tactive\t$2b$10$AV25Jpt348FrjfB40CkSwOV1CjpwNYHavBq/gdgnYuHHVzzsQ7Bvy\n",
+  "stderr": "",
+  "execution_time_ms": 1656
+}

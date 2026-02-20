@@ -1,0 +1,91 @@
+{
+  "query": "SELECT * FROM courseTemplates ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM courseTemplates ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "30002",
+      "name": "Test Template",
+      "instructorId": "1",
+      "description": "Test description",
+      "defaultFees": "[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]",
+      "createdAt": "2026-01-07 00:53:12",
+      "updatedAt": "2026-01-07 00:53:12"
+    },
+    {
+      "id": "30001",
+      "name": "Test Template",
+      "instructorId": "1",
+      "description": "Test description",
+      "defaultFees": "[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]",
+      "createdAt": "2026-01-07 00:31:56",
+      "updatedAt": "2026-01-07 00:31:56"
+    },
+    {
+      "id": "7",
+      "name": "التصوير بالجوال",
+      "instructorId": "1",
+      "description": "",
+      "defaultFees": "[{\"name\":\"الرسوم الأساسية\",\"amount\":\"300\",\"description\":\"\"},{\"name\":\"الرسوم بعد التخفيض\",\"amount\":\"250\",\"description\":\"\"}]",
+      "createdAt": "2026-01-06 20:50:37",
+      "updatedAt": "2026-01-06 20:50:37"
+    },
+    {
+      "id": "6",
+      "name": "Test Template",
+      "instructorId": "1",
+      "description": "Test description",
+      "defaultFees": "[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]",
+      "createdAt": "2026-01-06 20:48:52",
+      "updatedAt": "2026-01-06 20:48:52"
+    },
+    {
+      "id": "5",
+      "name": "Test Template",
+      "instructorId": "1",
+      "description": "Test description",
+      "defaultFees": "[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]",
+      "createdAt": "2026-01-06 20:19:02",
+      "updatedAt": "2026-01-06 20:19:02"
+    },
+    {
+      "id": "4",
+      "name": "تدريب المدربين",
+      "instructorId": "2",
+      "description": "",
+      "defaultFees": "[{\"name\":\"الرسوم الأساسية\",\"amount\":\"400\",\"description\":\"\"},{\"name\":\"الرسوم المخفضة\",\"amount\":\"350\",\"description\":\"\"}]",
+      "createdAt": "2026-01-06 20:13:27",
+      "updatedAt": "2026-01-06 20:13:27"
+    },
+    {
+      "id": "3",
+      "name": "Test Template",
+      "instructorId": "1",
+      "description": "Test description",
+      "defaultFees": "[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]",
+      "createdAt": "2026-01-06 20:12:13",
+      "updatedAt": "2026-01-06 20:12:13"
+    },
+    {
+      "id": "2",
+      "name": "Test Template",
+      "instructorId": "1",
+      "description": "Test description",
+      "defaultFees": "[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]",
+      "createdAt": "2026-01-06 20:02:23",
+      "updatedAt": "2026-01-06 20:02:23"
+    },
+    {
+      "id": "1",
+      "name": "تدريب المدربين ",
+      "instructorId": "NULL",
+      "description": "",
+      "defaultFees": "NULL",
+      "createdAt": "2026-01-06 19:54:04",
+      "updatedAt": "2026-01-06 19:54:04"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tinstructorId\tdescription\tdefaultFees\tcreatedAt\tupdatedAt\n30002\tTest Template\t1\tTest description\t[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]\t2026-01-07 00:53:12\t2026-01-07 00:53:12\n30001\tTest Template\t1\tTest description\t[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]\t2026-01-07 00:31:56\t2026-01-07 00:31:56\n7\tالتصوير بالجوال\t1\t\t[{\"name\":\"الرسوم الأساسية\",\"amount\":\"300\",\"description\":\"\"},{\"name\":\"الرسوم بعد التخفيض\",\"amount\":\"250\",\"description\":\"\"}]\t2026-01-06 20:50:37\t2026-01-06 20:50:37\n6\tTest Template\t1\tTest description\t[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]\t2026-01-06 20:48:52\t2026-01-06 20:48:52\n5\tTest Template\t1\tTest description\t[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]\t2026-01-06 20:19:02\t2026-01-06 20:19:02\n4\tتدريب المدربين\t2\t\t[{\"name\":\"الرسوم الأساسية\",\"amount\":\"400\",\"description\":\"\"},{\"name\":\"الرسوم المخفضة\",\"amount\":\"350\",\"description\":\"\"}]\t2026-01-06 20:13:27\t2026-01-06 20:13:27\n3\tTest Template\t1\tTest description\t[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]\t2026-01-06 20:12:13\t2026-01-06 20:12:13\n2\tTest Template\t1\tTest description\t[{\"name\":\"السعر الأساسي\",\"amount\":\"1000\",\"description\":\"\"},{\"name\":\"خصم الطلاب\",\"amount\":\"800\",\"description\":\"خصم 20%\"}]\t2026-01-06 20:02:23\t2026-01-06 20:02:23\n1\tتدريب المدربين \tNULL\t\tNULL\t2026-01-06 19:54:04\t2026-01-06 19:54:04\n",
+  "stderr": "",
+  "execution_time_ms": 2025
+}

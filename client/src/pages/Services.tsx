@@ -210,14 +210,14 @@ export default function Services() {
 
   const formatCurrency = (amount: number | string) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return new Intl.NumberFormat('ar-SA', {
+    return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(num) + ' ر.س.';
   };
 
   const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('ar-SA', {
+    return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

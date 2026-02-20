@@ -1,0 +1,20 @@
+{
+  "query": "SELECT u.id as user_id, u.name as user_name, u.email as user_email, u.roleId, \n       e.id as employee_id, e.name as employee_name, e.email as employee_email, e.userId as linked_user_id\nFROM users u\nLEFT JOIN employees e ON e.userId = u.id\nWHERE u.email LIKE '%samah%' OR e.email LIKE '%samah%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT u.id as user_id, u.name as user_name, u.email as user_email, u.roleId, \n       e.id as employee_id, e.name as employee_name, e.email as employee_email, e.userId as linked_user_id\nFROM users u\nLEFT JOIN employees e ON e.userId = u.id\nWHERE u.email LIKE '%samah%' OR e.email LIKE '%samah%';",
+  "rows": [
+    {
+      "user_id": "4320018",
+      "user_name": "سماح",
+      "user_email": "samah.issa2024@gmail.com",
+      "roleId": "4",
+      "employee_id": "NULL",
+      "employee_name": "NULL",
+      "employee_email": "NULL",
+      "linked_user_id": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tuser_name\tuser_email\troleId\temployee_id\temployee_name\temployee_email\tlinked_user_id\n4320018\tسماح\tsamah.issa2024@gmail.com\t4\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1540
+}

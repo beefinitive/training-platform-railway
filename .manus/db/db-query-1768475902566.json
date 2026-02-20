@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO userPermissions (userId, permissionId) SELECT u.id, p.id FROM users u, permissions p WHERE u.email = 'just2vip@gmail.com' AND p.name = 'courses.create';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute INSERT INTO userPermissions (userId, permissionId) SELECT u.id, p.id FROM users u, permissions p WHERE u.email = 'just2vip@gmail.com' AND p.name = 'courses.create';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1625
+}

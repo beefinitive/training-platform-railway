@@ -1,0 +1,21 @@
+{
+  "query": "SELECT et.id, et.targetType, et.customName, et.targetValue, et.currentValue, et.baseValue, et.month, et.year, et.status FROM employees e JOIN employeeTargets et ON e.id = et.employeeId WHERE e.name LIKE '%غادة%' AND et.year = 2026 AND et.month = 2;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT et.id, et.targetType, et.customName, et.targetValue, et.currentValue, et.baseValue, et.month, et.year, et.status FROM employees e JOIN employeeTargets et ON e.id = et.employeeId WHERE e.name LIKE '%غادة%' AND et.year = 2026 AND et.month = 2;",
+  "rows": [
+    {
+      "id": "420001",
+      "targetType": "confirmed_customers",
+      "customName": "",
+      "targetValue": "30.00",
+      "currentValue": "0.00",
+      "baseValue": "0.00",
+      "month": "2",
+      "year": "2026",
+      "status": "in_progress"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttargetType\tcustomName\ttargetValue\tcurrentValue\tbaseValue\tmonth\tyear\tstatus\n420001\tconfirmed_customers\t\t30.00\t0.00\t0.00\t2\t2026\tin_progress\n",
+  "stderr": "",
+  "execution_time_ms": 1536
+}

@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, email, roleId FROM users WHERE email LIKE '%ghada%' OR name LIKE '%غادة%';\nSELECT * FROM roles;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, email, roleId FROM users WHERE email LIKE '%ghada%' OR name LIKE '%غادة%';\nSELECT * FROM roles;",
+  "rows": [
+    {
+      "id": "2370097",
+      "name": "غادة حسن بسيوني",
+      "email": "ghadahassen28@gmail.com",
+      "roleId": "3"
+    }
+  ],
+  "messages": [
+    "id\tname\tdisplayName\tdescription\tisSystem\tcreatedAt\tupdatedAt",
+    "1\tadmin\tمدير النظام\tصلاحيات كاملة للنظام\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11",
+    "2\tsupervisor\tمشرف\tصلاحيات إدارة الدورات والتقارير\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11",
+    "3\tuser\tمستخدم\tصلاحيات عرض فقط\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11",
+    "4\tcustomer_service\tخدمة العملاء\tموظفو خدمة العملاء - يرون فقط صفحة المستهدفات الخاصة بهم\t1\t2026-01-14 19:16:05\t2026-01-14 19:16:05",
+    "30001\tCustomer Support\tاستعراض فقط\t\t0\t2026-01-09 07:00:36\t2026-01-11 19:20:23",
+    "60004\ttest_role\tدور الاختبار\tدور لاختبار الصلاحيات\t0\t2026-01-11 19:28:39\t2026-01-11 19:28:39"
+  ],
+  "stdout": "id\tname\temail\troleId\n2370097\tغادة حسن بسيوني\tghadahassen28@gmail.com\t3\nid\tname\tdisplayName\tdescription\tisSystem\tcreatedAt\tupdatedAt\n1\tadmin\tمدير النظام\tصلاحيات كاملة للنظام\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11\n2\tsupervisor\tمشرف\tصلاحيات إدارة الدورات والتقارير\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11\n3\tuser\tمستخدم\tصلاحيات عرض فقط\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11\n4\tcustomer_service\tخدمة العملاء\tموظفو خدمة العملاء - يرون فقط صفحة المستهدفات الخاصة بهم\t1\t2026-01-14 19:16:05\t2026-01-14 19:16:05\n30001\tCustomer Support\tاستعراض فقط\t\t0\t2026-01-09 07:00:36\t2026-01-11 19:20:23\n60004\ttest_role\tدور الاختبار\tدور لاختبار الصلاحيات\t0\t2026-01-11 19:28:39\t2026-01-11 19:28:39\n",
+  "stderr": "",
+  "execution_time_ms": 1801
+}

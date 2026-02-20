@@ -462,7 +462,7 @@ export default function CoursesHub() {
 
   // ============= Computed Values =============
   const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('ar-SA', {
+    return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

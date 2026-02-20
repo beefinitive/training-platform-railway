@@ -1,0 +1,9 @@
+{
+  "query": "DELETE t1 FROM courseTemplates t1 INNER JOIN courseTemplates t2 WHERE t1.id > t2.id AND t1.name = t2.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute DELETE t1 FROM courseTemplates t1 INNER JOIN courseTemplates t2 WHERE t1.id > t2.id AND t1.name = t2.name;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1489
+}

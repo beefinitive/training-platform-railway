@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, email, name, status FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, email, name, status FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "just2vip@gmail.com",
+      "name": "Mohamed Ibrahim",
+      "status": "active"
+    },
+    {
+      "id": "1500003",
+      "email": "test@example.com",
+      "name": "أحمد الاختبار",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tstatus\n1\tjust2vip@gmail.com\tMohamed Ibrahim\tactive\n1500003\ttest@example.com\tأحمد الاختبار\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1534
+}

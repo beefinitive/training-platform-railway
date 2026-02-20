@@ -1,0 +1,46 @@
+{
+  "query": "SELECT * FROM roles;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM roles;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "admin",
+      "displayName": "مدير النظام",
+      "description": "صلاحيات كاملة للنظام",
+      "isSystem": "1",
+      "createdAt": "2026-01-08 22:53:11",
+      "updatedAt": "2026-01-08 22:53:11"
+    },
+    {
+      "id": "2",
+      "name": "supervisor",
+      "displayName": "مشرف",
+      "description": "صلاحيات إدارة الدورات والتقارير",
+      "isSystem": "1",
+      "createdAt": "2026-01-08 22:53:11",
+      "updatedAt": "2026-01-08 22:53:11"
+    },
+    {
+      "id": "3",
+      "name": "user",
+      "displayName": "مستخدم",
+      "description": "صلاحيات عرض فقط",
+      "isSystem": "1",
+      "createdAt": "2026-01-08 22:53:11",
+      "updatedAt": "2026-01-08 22:53:11"
+    },
+    {
+      "id": "30001",
+      "name": "Customer Support",
+      "displayName": "خدمة عملاء ",
+      "description": "",
+      "isSystem": "0",
+      "createdAt": "2026-01-09 07:00:36",
+      "updatedAt": "2026-01-09 07:00:36"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tdisplayName\tdescription\tisSystem\tcreatedAt\tupdatedAt\n1\tadmin\tمدير النظام\tصلاحيات كاملة للنظام\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11\n2\tsupervisor\tمشرف\tصلاحيات إدارة الدورات والتقارير\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11\n3\tuser\tمستخدم\tصلاحيات عرض فقط\t1\t2026-01-08 22:53:11\t2026-01-08 22:53:11\n30001\tCustomer Support\tخدمة عملاء \t\t0\t2026-01-09 07:00:36\t2026-01-09 07:00:36\n",
+  "stderr": "",
+  "execution_time_ms": 1546
+}

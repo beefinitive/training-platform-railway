@@ -1,0 +1,37 @@
+{
+  "query": "SELECT s.id, s.name, s.totalAmount, s.saleDate, s.projectId, p.name as projectName, p.includeInReports \nFROM services s \nLEFT JOIN projects p ON s.projectId = p.id \nWHERE s.saleDate >= '2025-07-01' AND s.saleDate <= '2025-07-31'\nORDER BY s.saleDate;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT s.id, s.name, s.totalAmount, s.saleDate, s.projectId, p.name as projectName, p.includeInReports \nFROM services s \nLEFT JOIN projects p ON s.projectId = p.id \nWHERE s.saleDate >= '2025-07-01' AND s.saleDate <= '2025-07-31'\nORDER BY s.saleDate;",
+  "rows": [
+    {
+      "id": "90004",
+      "name": "شموخ القرآن ",
+      "totalAmount": "3500.00",
+      "saleDate": "2025-07-30",
+      "projectId": "NULL",
+      "projectName": "NULL",
+      "includeInReports": "NULL"
+    },
+    {
+      "id": "150001",
+      "name": "تدريب المدربين (مسجلة) ",
+      "totalAmount": "350.00",
+      "saleDate": "2025-07-31",
+      "projectId": "NULL",
+      "projectName": "NULL",
+      "includeInReports": "NULL"
+    },
+    {
+      "id": "150002",
+      "name": "الحقائب التدريبية مسجلة ",
+      "totalAmount": "250.00",
+      "saleDate": "2025-07-31",
+      "projectId": "NULL",
+      "projectName": "NULL",
+      "includeInReports": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttotalAmount\tsaleDate\tprojectId\tprojectName\tincludeInReports\n90004\tشموخ القرآن \t3500.00\t2025-07-30\tNULL\tNULL\tNULL\n150001\tتدريب المدربين (مسجلة) \t350.00\t2025-07-31\tNULL\tNULL\tNULL\n150002\tالحقائب التدريبية مسجلة \t250.00\t2025-07-31\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 2117
+}

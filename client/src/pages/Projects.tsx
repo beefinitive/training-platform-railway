@@ -441,7 +441,7 @@ export default function Projects() {
                     {projectServices.map((service) => (
                       <TableRow key={service.id}>
                         <TableCell>{service.name}</TableCell>
-                        <TableCell>{new Date(service.saleDate).toLocaleDateString('ar-SA')}</TableCell>
+                        <TableCell>{new Date(service.saleDate).toLocaleDateString('en-US')}</TableCell>
                         <TableCell>{Number(service.totalAmount).toLocaleString()} ر.س.</TableCell>
                         <TableCell>
                           <Button
@@ -478,7 +478,7 @@ export default function Projects() {
                     {unassignedServices.slice(0, 10).map((service) => (
                       <TableRow key={service.id}>
                         <TableCell>{service.name}</TableCell>
-                        <TableCell>{new Date(service.saleDate).toLocaleDateString('ar-SA')}</TableCell>
+                        <TableCell>{new Date(service.saleDate).toLocaleDateString('en-US')}</TableCell>
                         <TableCell>{Number(service.totalAmount).toLocaleString()} ر.س.</TableCell>
                         <TableCell>
                           <Button

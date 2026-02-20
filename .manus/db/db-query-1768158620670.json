@@ -1,0 +1,70 @@
+{
+  "query": "SELECT * FROM rolePermissions LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT * FROM rolePermissions LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "roleId": "1",
+      "permissionId": "1",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "2",
+      "roleId": "1",
+      "permissionId": "2",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "3",
+      "roleId": "1",
+      "permissionId": "3",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "4",
+      "roleId": "1",
+      "permissionId": "4",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "5",
+      "roleId": "1",
+      "permissionId": "5",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "6",
+      "roleId": "1",
+      "permissionId": "6",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "7",
+      "roleId": "1",
+      "permissionId": "7",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "8",
+      "roleId": "1",
+      "permissionId": "8",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "9",
+      "roleId": "1",
+      "permissionId": "9",
+      "createdAt": "2026-01-08 22:53:22"
+    },
+    {
+      "id": "10",
+      "roleId": "1",
+      "permissionId": "10",
+      "createdAt": "2026-01-08 22:53:22"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\troleId\tpermissionId\tcreatedAt\n1\t1\t1\t2026-01-08 22:53:22\n2\t1\t2\t2026-01-08 22:53:22\n3\t1\t3\t2026-01-08 22:53:22\n4\t1\t4\t2026-01-08 22:53:22\n5\t1\t5\t2026-01-08 22:53:22\n6\t1\t6\t2026-01-08 22:53:22\n7\t1\t7\t2026-01-08 22:53:22\n8\t1\t8\t2026-01-08 22:53:22\n9\t1\t9\t2026-01-08 22:53:22\n10\t1\t10\t2026-01-08 22:53:22\n",
+  "stderr": "",
+  "execution_time_ms": 1559
+}

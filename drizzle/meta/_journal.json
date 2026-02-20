@@ -239,6 +239,83 @@
       "when": 1768536404364,
       "tag": "0033_oval_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1770187817266,
+      "tag": "0034_spotty_alex_wilder",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1770191460792,
+      "tag": "0035_calm_may_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1770310629940,
+      "tag": "0036_windy_quasar",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1771306989123,
+      "tag": "0037_rainy_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1771390322751,
+      "tag": "0038_violet_harrier",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "5",
+      "when": 1771397030303,
+      "tag": "0039_real_kree",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1771398727479,
+      "tag": "0040_white_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "5",
+      "when": 1771400848046,
+      "tag": "0041_silent_clea",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "5",
+      "when": 1771403213440,
+      "tag": "0042_right_praxagora",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "5",
+      "when": 1771403868936,
+      "tag": "0043_blushing_matthew_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "5",
+      "when": 1771408116425,
+      "tag": "0044_melted_electro",
+      "breakpoints": true
     }
   ]
 }

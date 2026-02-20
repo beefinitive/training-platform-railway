@@ -23,11 +23,12 @@ import {
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { usePlatformSettings } from "@/contexts/PlatformSettingsContext";
-import { LayoutDashboard, LogOut, PanelRight, BookOpen, Receipt, Settings, Users, Archive, ShoppingBag, Wallet, Target, Handshake, Lightbulb, FileText, Shield, UserCog, FolderKanban, UserCheck, Clock, ClipboardList, Award, Banknote, Lock, Trash2, ClipboardCheck } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelRight, BookOpen, Receipt, Settings, Users, Archive, ShoppingBag, Wallet, Target, Handshake, Lightbulb, FileText, Shield, UserCog, FolderKanban, UserCheck, Clock, ClipboardList, Award, Banknote, Lock, Trash2, ClipboardCheck, BarChart3, Globe, ExternalLink, PlayCircle, TrendingUp, Bell } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { usePermissions, PERMISSIONS } from "@/hooks/usePermissions";
 
 // Role IDs
 const ROLE_ADMIN = 1;
@@ -35,55 +36,99 @@ const ROLE_SUPERVISOR = 2;
 const ROLE_USER = 3;
 const ROLE_CUSTOMER_SERVICE = 4; // دور خدمة العملاء
 
-// تعريف عناصر القائمة مع تحديد الأدوار المسموح لها
-// allowedRoles: null = جميع المستخدمين (ماعدا خدمة العملاء)، array = الأدوار المحددة فقط
-const allMenuItems = [
-  // صفحات عامة لجميع المستخدمين (ماعدا خدمة العملاء)
-  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: BookOpen, label: "إدارة الدورات", path: "/courses", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: ShoppingBag, label: "الخدمات", path: "/services", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: FolderKanban, label: "المشاريع", path: "/projects", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: Wallet, label: "المصروفات التشغيلية", path: "/operational-expenses", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: Target, label: "المستهدفات", path: "/strategic-targets", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: Handshake, label: "الشراكات", path: "/partnerships", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: Lightbulb, label: "الأفكار النوعية", path: "/innovative-ideas", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: Receipt, label: "التقارير", path: "/reports", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  { icon: Archive, label: "الأرشيف", path: "/archive", allowedRoles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_USER] },
-  
-  // صفحة مستهدفاتي - لخدمة العملاء فقط
-  { icon: Target, label: "مستهدفاتي", path: "/my-targets", allowedRoles: [ROLE_CUSTOMER_SERVICE] },
-  
-  // صفحات إدارية - للـ Admin فقط
-  { icon: Settings, label: "الإعدادات", path: "/settings", allowedRoles: [ROLE_ADMIN] },
-  { icon: UserCheck, label: "إدارة الموظفين", path: "/employee-management", allowedRoles: [ROLE_ADMIN] },
-  { icon: Clock, label: "الحضور والانصراف", path: "/attendance", allowedRoles: [ROLE_ADMIN] },
-  { icon: ClipboardList, label: "تقارير الإنجاز", path: "/daily-reports", allowedRoles: [ROLE_ADMIN] },
-  { icon: ClipboardCheck, label: "مراجعة الإحصائيات", path: "/daily-stats-review", allowedRoles: [ROLE_ADMIN] },
-  { icon: Lock, label: "إدارة كلمات المرور", path: "/password-management", allowedRoles: [ROLE_ADMIN] },
-  { icon: Users, label: "إدارة المستخدمين", path: "/user-management", allowedRoles: [ROLE_ADMIN] },
+// تعريف مجموعات القائمة مع الصلاحيات
+type MenuItem = {
+  icon: any;
+  label: string;
+  path: string;
+  requiredPermission?: string;
+  customerServiceOnly?: boolean;
+  adminOnly?: boolean;
+  isSubItem?: boolean;
+};
+
+type MenuGroup = {
+  title: string;
+  items: MenuItem[];
+};
+
+const menuGroups: MenuGroup[] = [
+  {
+    title: "الرئيسية",
+    items: [
+      { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", requiredPermission: PERMISSIONS.DASHBOARD_VIEW },
+    ],
+  },
+  {
+    title: "إدارة الأعمال",
+    items: [
+      { icon: BookOpen, label: "إدارة الدورات", path: "/courses", requiredPermission: PERMISSIONS.COURSES_VIEW },
+      { icon: ShoppingBag, label: "الخدمات", path: "/services", requiredPermission: PERMISSIONS.SERVICES_VIEW },
+      { icon: FolderKanban, label: "المشاريع", path: "/projects", requiredPermission: PERMISSIONS.COURSES_VIEW },
+      { icon: PlayCircle, label: "الدورات المسجلة", path: "/recorded-courses", requiredPermission: PERMISSIONS.COURSES_VIEW },
+      { icon: Wallet, label: "المصروفات التشغيلية", path: "/operational-expenses", requiredPermission: PERMISSIONS.EXPENSES_VIEW },
+    ],
+  },
+  {
+    title: "التخطيط والتطوير",
+    items: [
+      { icon: Target, label: "المستهدفات", path: "/strategic-targets", requiredPermission: PERMISSIONS.TARGETS_VIEW },
+      { icon: Handshake, label: "الشراكات", path: "/partnerships", requiredPermission: PERMISSIONS.PARTNERSHIPS_VIEW },
+      { icon: Lightbulb, label: "الأفكار النوعية", path: "/innovative-ideas", requiredPermission: PERMISSIONS.IDEAS_VIEW },
+    ],
+  },
+  {
+    title: "التقارير والأرشيف",
+    items: [
+      { icon: Receipt, label: "التقارير", path: "/reports", requiredPermission: PERMISSIONS.REPORTS_VIEW },
+      { icon: Archive, label: "الأرشيف", path: "/archive", requiredPermission: PERMISSIONS.ARCHIVE_VIEW },
+    ],
+  },
+  {
+    title: "حسابي",
+    items: [
+      { icon: Award, label: "شهاداتي", path: "/my-certificates" },
+      { icon: Banknote, label: "مدفوعاتي", path: "/my-payments" },
+      { icon: TrendingUp, label: "لوحة المدرب", path: "/instructor-dashboard" },
+    ],
+  },
+  {
+    title: "خدمة العملاء",
+    items: [
+      { icon: Target, label: "مستهدفاتي", path: "/my-targets", customerServiceOnly: true },
+    ],
+  },
+  {
+    title: "إدارة الموظفين",
+    items: [
+      { icon: UserCheck, label: "إدارة الموظفين", path: "/employee-management", requiredPermission: PERMISSIONS.EMPLOYEES_VIEW },
+      { icon: Clock, label: "الحضور والانصراف", path: "/attendance", requiredPermission: PERMISSIONS.EMPLOYEES_VIEW },
+      { icon: ClipboardList, label: "تقارير الإنجاز", path: "/daily-reports", requiredPermission: PERMISSIONS.EMPLOYEES_VIEW },
+      { icon: ClipboardCheck, label: "مراجعة الإحصائيات", path: "/daily-stats-review", requiredPermission: PERMISSIONS.EMPLOYEE_STATS_REVIEW, isSubItem: true },
+      { icon: Award, label: "مستهدفات الموظفين", path: "/employee-targets", requiredPermission: PERMISSIONS.EMPLOYEE_TARGETS_VIEW, isSubItem: true },
+      { icon: BarChart3, label: "تقارير الإحصائيات المعتمدة", path: "/approved-stats-report", requiredPermission: PERMISSIONS.EMPLOYEE_PERFORMANCE_VIEW, isSubItem: true },
+      { icon: Bell, label: "تنبيهات المستهدفات", path: "/target-alerts", requiredPermission: PERMISSIONS.EMPLOYEE_TARGETS_VIEW, isSubItem: true },
+    ],
+  },
+  {
+    title: "النظام",
+    items: [
+      { icon: Settings, label: "الإعدادات", path: "/settings", requiredPermission: PERMISSIONS.SETTINGS_VIEW },
+      { icon: Lock, label: "إدارة كلمات المرور", path: "/password-management", requiredPermission: PERMISSIONS.USERS_PERMISSIONS },
+      { icon: Users, label: "إدارة المستخدمين", path: "/user-management", requiredPermission: PERMISSIONS.USERS_VIEW },
+    ],
+  },
 ];
-
-const SIDEBAR_WIDTH_KEY = "sidebar-width";
-const DEFAULT_WIDTH = 280;
-const MIN_WIDTH = 200;
-const MAX_WIDTH = 480;
-
-// التحقق من صلاحية الوصول للعنصر
-function canAccessMenuItem(user: any, allowedRoles: number[] | null): boolean {
-  if (!user) return false;
-  if (allowedRoles === null) return true; // متاح للجميع
-  return allowedRoles.includes(user.roleId);
-}
-
-// التحقق من أن المستخدم هو Admin
-function isAdmin(user: any): boolean {
-  return user?.roleId === ROLE_ADMIN;
-}
 
 // التحقق من أن المستخدم هو خدمة عملاء
 function isCustomerService(user: any): boolean {
   return user?.roleId === ROLE_CUSTOMER_SERVICE;
 }
+
+const SIDEBAR_WIDTH_KEY = "sidebar-width";
+const DEFAULT_WIDTH = 280;
+const MIN_WIDTH = 200;
+const MAX_WIDTH = 480;
 
 export default function DashboardLayout({
   children,
@@ -174,18 +219,63 @@ function DashboardLayoutContent({
   const isMobile = useIsMobile();
   const { settings } = usePlatformSettings();
   
+  // الحصول على صلاحيات المستخدم
+  const { hasPermission, isLoading: permissionsLoading } = usePermissions();
+  
   // الحصول على بيانات الموظف المرتبط بالمستخدم (لعرض الصورة)
   const { data: employeeData } = trpc.employees.getByUserId.useQuery(
     { userId: user?.id ?? 0 },
     { enabled: !!user?.id }
   );
 
-  // فلترة عناصر القائمة بناءً على صلاحيات المستخدم
-  const menuItems = useMemo(() => {
-    return allMenuItems.filter(item => canAccessMenuItem(user, item.allowedRoles));
-  }, [user]);
+  // عدد التنبيهات غير المقروءة
+  const { data: unreadAlertCount } = trpc.targetAlerts.unreadCount.useQuery(
+    {},
+    { refetchInterval: 60000 } // تحديث كل دقيقة
+  );
 
-  const activeMenuItem = menuItems.find(item => item.path === location);
+  // فلترة مجموعات القائمة بناءً على صلاحيات المستخدم
+  const filteredGroups = useMemo(() => {
+    if (!user) return [];
+    
+    const isAdmin = user.roleId === ROLE_ADMIN;
+    
+    return menuGroups
+      .map(group => ({
+        ...group,
+        items: group.items.filter(item => {
+          // إذا كان العنصر خاص بخدمة العملاء فقط
+          if (item.customerServiceOnly) {
+            return isCustomerService(user);
+          }
+          
+          // إذا كان المستخدم خدمة عملاء، لا يرى الصفحات الأخرى
+          if (isCustomerService(user)) {
+            return false;
+          }
+          
+          // المدير يرى كل شيء
+          if (isAdmin) {
+            return true;
+          }
+          
+          // المستخدم العادي يحتاج صلاحية محددة
+          if (item.requiredPermission) {
+            return hasPermission(item.requiredPermission);
+          }
+          
+          return false;
+        }),
+      }))
+      .filter(group => group.items.length > 0);
+  }, [user, hasPermission]);
+
+  // قائمة مسطحة لتحديد العنصر النشط
+  const allFilteredItems = useMemo(() => {
+    return filteredGroups.flatMap(g => g.items);
+  }, [filteredGroups]);
+
+  const activeMenuItem = allFilteredItems.find(item => item.path === location);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -264,34 +354,73 @@ function DashboardLayoutContent({
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="gap-0">
-            <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
-                const isActive = location === item.path;
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      onClick={() => setLocation(item.path)}
-                      tooltip={item.label}
-                      className={`h-10 transition-all font-normal`}
-                    >
-                      <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
-                      />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+          <SidebarContent className="gap-0 overflow-y-auto">
+            {filteredGroups.map((group, groupIndex) => (
+              <div key={group.title}>
+                {/* فاصل بين المجموعات */}
+                {groupIndex > 0 && (
+                  <div className="mx-3 my-1.5 border-t border-border/50" />
+                )}
+                {/* عنوان المجموعة - يظهر فقط عند فتح القائمة */}
+                {!isCollapsed && (
+                  <div className="px-4 pt-3 pb-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                      {group.title}
+                    </span>
+                  </div>
+                )}
+                <SidebarMenu className="px-2 py-0.5">
+                  {group.items.map(item => {
+                    const isActive = location === item.path;
+                    return (
+                      <SidebarMenuItem key={item.path}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          onClick={() => setLocation(item.path)}
+                          tooltip={item.label}
+                          className={`h-9 transition-all font-normal ${item.isSubItem ? 'mr-4 text-sm' : ''}`}
+                        >
+                          <item.icon
+                            className={`h-4 w-4 shrink-0 ${isActive ? "text-primary" : ""} ${item.isSubItem ? 'h-3.5 w-3.5' : ''}`}
+                          />
+                          <span className="truncate">{item.label}</span>
+                          {item.path === '/target-alerts' && (unreadAlertCount ?? 0) > 0 && (
+                            <span className="mr-auto bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                              {unreadAlertCount}
+                            </span>
+                          )}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </div>
+            ))}
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="p-2 space-y-1">
+            {/* رابط الواجهة العامة - للأدمن فقط */}
+            {user?.roleId === ROLE_ADMIN && (
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => window.open('/public', '_blank')}
+                    tooltip="الواجهة العامة"
+                    className="h-9 transition-all font-normal text-primary hover:text-primary hover:bg-primary/10"
+                  >
+                    <Globe className="h-4 w-4 shrink-0" />
+                    <span className="truncate">الواجهة العامة</span>
+                    <ExternalLink className="h-3 w-3 mr-auto opacity-50" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            )}
+            
+            {/* معلومات المستخدم */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-right group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <Avatar className="h-9 w-9 border shrink-0">
+                <button className="flex items-center gap-3 rounded-lg px-1 py-1.5 hover:bg-accent/50 transition-colors w-full text-right group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <Avatar className="h-8 w-8 border shrink-0">
                     {employeeData?.profileImage && (
                       <AvatarImage src={employeeData.profileImage} alt={user?.name || ''} />
                     )}
@@ -303,7 +432,7 @@ function DashboardLayoutContent({
                     <p className="text-sm font-medium truncate leading-none">
                       {user?.name || "-"}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate mt-1.5">
+                    <p className="text-xs text-muted-foreground truncate mt-1">
                       {user?.email || "-"}
                     </p>
                   </div>
@@ -353,7 +482,25 @@ function DashboardLayoutContent({
             </div>
           </div>
         )}
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6">
+          {/* عرض رسالة للمستخدم بدون صلاحيات */}
+          {allFilteredItems.length === 0 && user?.roleId !== ROLE_ADMIN && !isCustomerService(user) ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+                <Shield className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">لا توجد صلاحيات</h2>
+              <p className="text-muted-foreground max-w-md mb-4">
+                لم يتم تعيين أي صلاحيات لحسابك بعد. يرجى التواصل مع مدير النظام للحصول على الصلاحيات المطلوبة.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                البريد الإلكتروني: {user?.email}
+              </p>
+            </div>
+          ) : (
+            children
+          )}
+        </main>
       </SidebarInset>
     </>
   );

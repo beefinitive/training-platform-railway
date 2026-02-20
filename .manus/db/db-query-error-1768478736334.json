@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, employee_id, course_id, confirmed_customers, course_fee, calculated_revenue, status, reviewed_by, reviewed_at \nFROM daily_stats \nWHERE status = 'approved' \nORDER BY reviewed_at DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, employee_id, course_id, confirmed_customers, course_fee, calculated_revenue, status, reviewed_by, reviewed_at \nFROM daily_stats \nWHERE status = 'approved' \nORDER BY reviewed_at DESC \nLIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'employee_id' in 'field list'"
+  ]
+}

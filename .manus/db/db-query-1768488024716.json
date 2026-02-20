@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, status FROM courses ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, status FROM courses ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "210001",
+      "name": "دورة إعداد الحقائب التدريبية",
+      "status": "active"
+    },
+    {
+      "id": "180002",
+      "name": "التسويق الإلكتروني",
+      "status": "active"
+    },
+    {
+      "id": "180001",
+      "name": "التصوير بالجوال",
+      "status": "active"
+    },
+    {
+      "id": "150013",
+      "name": "التسويق الإلكتروني",
+      "status": "completed"
+    },
+    {
+      "id": "150012",
+      "name": "تدريب المدربين",
+      "status": "completed"
+    },
+    {
+      "id": "150011",
+      "name": "التصوير بالجوال",
+      "status": "completed"
+    },
+    {
+      "id": "150010",
+      "name": "التصوير بالجوال",
+      "status": "completed"
+    },
+    {
+      "id": "150009",
+      "name": "التسويق الإلكتروني",
+      "status": "completed"
+    },
+    {
+      "id": "150008",
+      "name": "تدريب المدربين",
+      "status": "completed"
+    },
+    {
+      "id": "150007",
+      "name": "التصوير بالجوال",
+      "status": "completed"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tstatus\n210001\tدورة إعداد الحقائب التدريبية\tactive\n180002\tالتسويق الإلكتروني\tactive\n180001\tالتصوير بالجوال\tactive\n150013\tالتسويق الإلكتروني\tcompleted\n150012\tتدريب المدربين\tcompleted\n150011\tالتصوير بالجوال\tcompleted\n150010\tالتصوير بالجوال\tcompleted\n150009\tالتسويق الإلكتروني\tcompleted\n150008\tتدريب المدربين\tcompleted\n150007\tالتصوير بالجوال\tcompleted\n",
+  "stderr": "",
+  "execution_time_ms": 1669
+}

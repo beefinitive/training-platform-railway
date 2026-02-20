@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, name, email, loginMethod, roleId, status FROM users ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, name, email, loginMethod, roleId, status FROM users ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Mohamed Ibrahim",
+      "email": "just2vip@gmail.com",
+      "loginMethod": "google",
+      "roleId": "1",
+      "status": "active"
+    },
+    {
+      "id": "2370097",
+      "name": "غادة حسن بسيوني",
+      "email": "ghadahassen28@gmail.com",
+      "loginMethod": "password",
+      "roleId": "4",
+      "status": "active"
+    },
+    {
+      "id": "2760033",
+      "name": "دينا نبيل ",
+      "email": "dinanabil@gmail.com",
+      "loginMethod": "password",
+      "roleId": "3",
+      "status": "active"
+    },
+    {
+      "id": "4320018",
+      "name": "سماح",
+      "email": "samah.issa2024@gmail.com",
+      "loginMethod": "password",
+      "roleId": "4",
+      "status": "active"
+    },
+    {
+      "id": "5310045",
+      "name": "أسماء إبراهيم",
+      "email": "asmaasnowwhite@gmail.com",
+      "loginMethod": "password",
+      "roleId": "3",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tloginMethod\troleId\tstatus\n1\tMohamed Ibrahim\tjust2vip@gmail.com\tgoogle\t1\tactive\n2370097\tغادة حسن بسيوني\tghadahassen28@gmail.com\tpassword\t4\tactive\n2760033\tدينا نبيل \tdinanabil@gmail.com\tpassword\t3\tactive\n4320018\tسماح\tsamah.issa2024@gmail.com\tpassword\t4\tactive\n5310045\tأسماء إبراهيم\tasmaasnowwhite@gmail.com\tpassword\t3\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1506
+}

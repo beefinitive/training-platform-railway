@@ -1,0 +1,1 @@
+ALTER TABLE `daily_stats` ADD `targetedByServices` int DEFAULT 0 NOT NULL;

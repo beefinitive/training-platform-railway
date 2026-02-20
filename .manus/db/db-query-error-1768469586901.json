@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, employee_id, target_type, target_value, current_value, base_value, status FROM employeeTargets WHERE employee_id = 1 LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SELECT id, employee_id, target_type, target_value, current_value, base_value, status FROM employeeTargets WHERE employee_id = 1 LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'employee_id' in 'where clause'"
+  ]
+}

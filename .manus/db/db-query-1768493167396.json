@@ -1,0 +1,16 @@
+{
+  "query": "SHOW TABLES LIKE '%salar%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user RrKkPPQnXVm5Rho.2d4039ed4870 --database 2Cfui6dKDoaQSG5hbwXu6R --execute SHOW TABLES LIKE '%salar%';",
+  "rows": [
+    {
+      "Tables_in_2Cfui6dKDoaQSG5hbwXu6R (%salar%)": "monthly_salaries"
+    },
+    {
+      "Tables_in_2Cfui6dKDoaQSG5hbwXu6R (%salar%)": "salary_adjustments"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_2Cfui6dKDoaQSG5hbwXu6R (%salar%)\nmonthly_salaries\nsalary_adjustments\n",
+  "stderr": "",
+  "execution_time_ms": 1555
+}
