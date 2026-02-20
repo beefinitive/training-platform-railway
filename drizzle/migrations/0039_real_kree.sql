@@ -1,0 +1,1 @@
+ALTER TABLE `course_display_settings` ADD `thumbnailUrl` text;

@@ -1,0 +1,1 @@
+ALTER TABLE `employeeTargets` ADD `baseValue` decimal(10,2) DEFAULT '0' NOT NULL;

@@ -1,0 +1,1 @@
+ALTER TABLE `courseTemplates` ADD `isActive` boolean DEFAULT true NOT NULL;

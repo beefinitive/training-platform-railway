@@ -1,0 +1,1 @@
+ALTER TABLE `employees` ADD `nationalId` varchar(20);

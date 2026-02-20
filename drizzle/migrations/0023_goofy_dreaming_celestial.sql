@@ -1,0 +1,1 @@
+ALTER TABLE `employeeTargets` MODIFY COLUMN `targetType` enum('daily_calls','confirmed_customers','registered_customers','targeted_customers','services_sold','retargeting','campaigns','leads_generated','conversion_rate','features_completed','bugs_fixed','sales_amount','customer_satisfaction','attendance_hours','other') NOT NULL;

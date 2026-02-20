@@ -1,0 +1,1 @@
+ALTER TABLE `platformSettings` MODIFY COLUMN `value` longtext;

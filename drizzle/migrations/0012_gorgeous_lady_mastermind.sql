@@ -1,0 +1,1 @@
+ALTER TABLE `strategicTargets` MODIFY COLUMN `type` enum('direct_courses','new_courses','recorded_courses','customers','annual_profit','entity_partnerships','individual_partnerships','innovative_ideas','service_quality','customer_satisfaction','website_quality') NOT NULL;

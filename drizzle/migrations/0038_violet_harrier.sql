@@ -1,0 +1,1 @@
+ALTER TABLE `courseFees` ADD `originalPrice` decimal(10,2);
