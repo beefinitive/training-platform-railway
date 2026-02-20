@@ -2493,20 +2493,27 @@ export const appRouter = router({
         
         // Upload thumbnail if it's a base64 data URL
         if (data.thumbnailUrl && data.thumbnailUrl.startsWith('data:')) {
-          try {
-            const { storagePut } = await import('./storage');
-            const matches = data.thumbnailUrl.match(/^data:([^;]+);base64,(.+)$/);
-            if (matches) {
-              const contentType = matches[1];
-              const base64Data = matches[2];
-              const buffer = Buffer.from(base64Data, 'base64');
-              const extension = contentType.split('/')[1] || 'png';
-              const fileName = `courses/thumbnails/${courseId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
-              const result = await storagePut(fileName, buffer, contentType);
-              data.thumbnailUrl = result.url;
+          // Check if storage credentials are available
+          const { ENV } = await import('./_core/env');
+          if (ENV.forgeApiUrl && ENV.forgeApiKey) {
+            try {
+              const { storagePut } = await import('./storage');
+              const matches = data.thumbnailUrl.match(/^data:([^;]+);base64,(.+)$/);
+              if (matches) {
+                const contentType = matches[1];
+                const base64Data = matches[2];
+                const buffer = Buffer.from(base64Data, 'base64');
+                const extension = contentType.split('/')[1] || 'png';
+                const fileName = `courses/thumbnails/${courseId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
+                const result = await storagePut(fileName, buffer, contentType);
+                data.thumbnailUrl = result.url;
+              }
+            } catch (error) {
+              console.error('Failed to upload course thumbnail:', error);
+              data.thumbnailUrl = undefined;
             }
-          } catch (error) {
-            console.error('Failed to upload course thumbnail:', error);
+          } else {
+            console.warn('Storage credentials not configured, skipping thumbnail upload');
             data.thumbnailUrl = undefined;
           }
         }
