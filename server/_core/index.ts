@@ -43,7 +43,8 @@ async function startServer() {
     try {
       const bcrypt = await import('bcryptjs');
       const { db } = await import('../db');
-      const { users } = await import('../../db/schema');
+      const schema = await import('../../drizzle/schema');
+      const { users } = schema;
       
       const password = 'Admin@123456';
       const hashedPassword = await bcrypt.hash(password, 10);
