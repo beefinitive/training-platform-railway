@@ -2493,9 +2493,13 @@ export const appRouter = router({
         
         // Upload thumbnail if it's a base64 data URL
         if (data.thumbnailUrl && data.thumbnailUrl.startsWith('data:')) {
-          // Check if storage credentials are available
+          // Check if storage credentials are available before attempting upload
           const { ENV } = await import('./_core/env');
-          if (ENV.forgeApiUrl && ENV.forgeApiKey) {
+          if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
+            console.warn('[courseDisplaySettings] Storage credentials not configured (BUILT_IN_FORGE_API_URL/BUILT_IN_FORGE_API_KEY missing), removing thumbnail from save data');
+            // Remove thumbnail from data to allow save to proceed
+            delete data.thumbnailUrl;
+          } else {
             try {
               const { storagePut } = await import('./storage');
               const matches = data.thumbnailUrl.match(/^data:([^;]+);base64,(.+)$/);
@@ -2507,14 +2511,13 @@ export const appRouter = router({
                 const fileName = `courses/thumbnails/${courseId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
                 const result = await storagePut(fileName, buffer, contentType);
                 data.thumbnailUrl = result.url;
+                console.log(`[courseDisplaySettings] Successfully uploaded thumbnail: ${result.url}`);
               }
             } catch (error) {
-              console.error('Failed to upload course thumbnail:', error);
-              data.thumbnailUrl = undefined;
+              console.error('[courseDisplaySettings] Failed to upload course thumbnail:', error);
+              // Remove thumbnail from data to allow save to proceed
+              delete data.thumbnailUrl;
             }
-          } else {
-            console.warn('Storage credentials not configured, skipping thumbnail upload');
-            data.thumbnailUrl = undefined;
           }
         }
         
