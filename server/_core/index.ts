@@ -38,6 +38,32 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
+  // TEMPORARY: Create admin user endpoint
+  app.post('/api/temp-create-admin', async (req, res) => {
+    try {
+      const bcrypt = await import('bcryptjs');
+      const { db } = await import('../db');
+      const { users } = await import('../../db/schema');
+      
+      const password = 'Admin@123456';
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      await db.insert(users).values({
+        openId: 'admin_001',
+        name: 'مدير النظام',
+        email: 'admin@training-platform.com',
+        password: hashedPassword,
+        loginMethod: 'password',
+        roleId: 1,
+        status: 'active',
+      });
+      
+      res.json({ success: true, message: 'Admin user created successfully' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
   // File upload API
   const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
   app.post('/api/upload', upload.single('file'), async (req, res) => {
